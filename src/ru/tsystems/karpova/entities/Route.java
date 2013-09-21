@@ -1,13 +1,16 @@
 package ru.tsystems.karpova.entities;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Ekaterina
- * Date: 18.09.13
- * Time: 23:53
+ * Date: 21.09.13
+ * Time: 11:55
  * To change this template use File | Settings | File Templates.
  */
 @Entity
@@ -16,13 +19,24 @@ public class Route {
 
     @javax.persistence.Column(name = "id")
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    private String name;
+
+    @javax.persistence.Column(name = "name")
+    @Basic
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     private double coeffDate;
@@ -59,6 +73,7 @@ public class Route {
         if (Double.compare(route.coeffDate, coeffDate) != 0) return false;
         if (Double.compare(route.coeffSeats, coeffSeats) != 0) return false;
         if (id != route.id) return false;
+        if (name != null ? !name.equals(route.name) : route.name != null) return false;
 
         return true;
     }
@@ -68,6 +83,7 @@ public class Route {
         int result;
         long temp;
         result = id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         temp = Double.doubleToLongBits(coeffDate);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(coeffSeats);
@@ -75,18 +91,20 @@ public class Route {
         return result;
     }
 
-    private Collection<StationRoute> stationRoutesById;
+    private Collection<Schedule> schedulesById;
 
     @OneToMany(mappedBy = "routeByIdRoute")
-    public Collection<StationRoute> getStationRoutesById() {
-        return stationRoutesById;
+    public Collection<Schedule> getSchedulesById() {
+        return schedulesById;
     }
 
-    public void setStationRoutesById(Collection<StationRoute> stationRoutesById) {
-        this.stationRoutesById = stationRoutesById;
+    public void setSchedulesById(Collection<Schedule> schedulesById) {
+        this.schedulesById = schedulesById;
     }
 
-    private Collection<Train> trainsById;
+    public void setSchedulesById(Collection<Schedule> schedulesById) {
+        this.schedulesById = schedulesById;
+    }    private Collection<Train> trainsById;
 
     @OneToMany(mappedBy = "routeByIdRoute")
     public Collection<Train> getTrainsById() {

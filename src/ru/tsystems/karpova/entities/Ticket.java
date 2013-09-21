@@ -1,12 +1,15 @@
 package ru.tsystems.karpova.entities;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Ekaterina
- * Date: 18.09.13
- * Time: 23:53
+ * Date: 21.09.13
+ * Time: 11:55
  * To change this template use File | Settings | File Templates.
  */
 @Entity
@@ -15,7 +18,6 @@ public class Ticket {
 
     @javax.persistence.Column(name = "id")
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }
@@ -69,6 +71,30 @@ public class Ticket {
 
     public void setPassengerByIdPassenger(Passenger passengerByIdPassenger) {
         this.passengerByIdPassenger = passengerByIdPassenger;
+    }
+
+    private Station stationByStationFrom;
+
+    @ManyToOne
+    @javax.persistence.JoinColumn(name = "station_from", referencedColumnName = "id", nullable = false)
+    public Station getStationByStationFrom() {
+        return stationByStationFrom;
+    }
+
+    public void setStationByStationFrom(Station stationByStationFrom) {
+        this.stationByStationFrom = stationByStationFrom;
+    }
+
+    private Station stationByStationTo;
+
+    @ManyToOne
+    @javax.persistence.JoinColumn(name = "station_to", referencedColumnName = "id", nullable = false)
+    public Station getStationByStationTo() {
+        return stationByStationTo;
+    }
+
+    public void setStationByStationTo(Station stationByStationTo) {
+        this.stationByStationTo = stationByStationTo;
     }
 
     private Train trainByIdTrain;

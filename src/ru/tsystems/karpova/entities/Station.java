@@ -1,13 +1,16 @@
 package ru.tsystems.karpova.entities;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Ekaterina
- * Date: 18.09.13
- * Time: 23:53
+ * Date: 21.09.13
+ * Time: 11:55
  * To change this template use File | Settings | File Templates.
  */
 @Entity
@@ -16,7 +19,6 @@ public class Station {
 
     @javax.persistence.Column(name = "id")
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }
@@ -57,15 +59,26 @@ public class Station {
         return result;
     }
 
-    private Collection<StationRoute> stationRoutesById;
+    private Collection<Ticket> ticketsById;
 
-    @OneToMany(mappedBy = "stationByIdStation")
-    public Collection<StationRoute> getStationRoutesById() {
-        return stationRoutesById;
+    @OneToMany(mappedBy = "stationByStationFrom")
+    public Collection<Ticket> getTicketsById() {
+        return ticketsById;
     }
 
-    public void setStationRoutesById(Collection<StationRoute> stationRoutesById) {
-        this.stationRoutesById = stationRoutesById;
+    public void setTicketsById(Collection<Ticket> ticketsById) {
+        this.ticketsById = ticketsById;
+    }
+
+    private Collection<Ticket> ticketsById_0;
+
+    @OneToMany(mappedBy = "stationByStationTo")
+    public Collection<Ticket> getTicketsById_0() {
+        return ticketsById_0;
+    }
+
+    public void setTicketsById_0(Collection<Ticket> ticketsById_0) {
+        this.ticketsById_0 = ticketsById_0;
     }
 
     private Collection<Way> waysById;

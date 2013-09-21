@@ -2,12 +2,13 @@ package ru.tsystems.karpova.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Ekaterina
- * Date: 18.09.13
- * Time: 23:53
+ * Date: 21.09.13
+ * Time: 11:55
  * To change this template use File | Settings | File Templates.
  */
 @Entity
@@ -16,7 +17,6 @@ public class Way {
 
     @javax.persistence.Column(name = "id")
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }
@@ -74,10 +74,21 @@ public class Way {
         return result;
     }
 
+    private Collection<Schedule> schedulesById;
+
+    @OneToMany(mappedBy = "wayByIdWay")
+    public Collection<Schedule> getSchedulesById() {
+        return schedulesById;
+    }
+
+    public void setSchedulesById(Collection<Schedule> schedulesById) {
+        this.schedulesById = schedulesById;
+    }
+
     private Station stationByIdStation1;
 
     @ManyToOne
-    @javax.persistence.JoinColumn(name = "id_station1", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_station1", referencedColumnName = "id", nullable = false)
     public Station getStationByIdStation1() {
         return stationByIdStation1;
     }
@@ -89,7 +100,7 @@ public class Way {
     private Station stationByIdStation2;
 
     @ManyToOne
-    @javax.persistence.JoinColumn(name = "id_station2", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_station2", referencedColumnName = "id", nullable = false)
     public Station getStationByIdStation2() {
         return stationByIdStation2;
     }

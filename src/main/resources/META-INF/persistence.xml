@@ -10,6 +10,7 @@
         <class>ru.tsystems.karpova.entities.Ticket</class>
         <class>ru.tsystems.karpova.entities.Train</class>
         <class>ru.tsystems.karpova.entities.Way</class>
+        <class>ru.tsystems.karpova.entities.Schedule</class>
 
         <properties>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/karpova"/>

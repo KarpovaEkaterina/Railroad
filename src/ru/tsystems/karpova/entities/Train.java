@@ -7,8 +7,8 @@ import java.util.Collection;
 /**
  * Created with IntelliJ IDEA.
  * User: Ekaterina
- * Date: 18.09.13
- * Time: 23:53
+ * Date: 21.09.13
+ * Time: 11:55
  * To change this template use File | Settings | File Templates.
  */
 @Entity
@@ -17,13 +17,24 @@ public class Train {
 
     @javax.persistence.Column(name = "id")
     @Id
-    @GeneratedValue
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    private String name;
+
+    @javax.persistence.Column(name = "name")
+    @Basic
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     private int totalSeats;
@@ -60,6 +71,7 @@ public class Train {
         if (id != train.id) return false;
         if (totalSeats != train.totalSeats) return false;
         if (departure != null ? !departure.equals(train.departure) : train.departure != null) return false;
+        if (name != null ? !name.equals(train.name) : train.name != null) return false;
 
         return true;
     }
@@ -67,6 +79,7 @@ public class Train {
     @Override
     public int hashCode() {
         int result = id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + totalSeats;
         result = 31 * result + (departure != null ? departure.hashCode() : 0);
         return result;
