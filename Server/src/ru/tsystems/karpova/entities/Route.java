@@ -102,9 +102,7 @@ public class Route {
         this.schedulesById = schedulesById;
     }
 
-    public void setSchedulesById(Collection<Schedule> schedulesById) {
-        this.schedulesById = schedulesById;
-    }    private Collection<Train> trainsById;
+    private Collection<Train> trainsById;
 
     @OneToMany(mappedBy = "routeByIdRoute")
     public Collection<Train> getTrainsById() {
