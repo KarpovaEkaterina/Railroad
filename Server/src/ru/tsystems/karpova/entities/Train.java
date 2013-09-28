@@ -4,18 +4,12 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 21.09.13
- * Time: 11:55
- * To change this template use File | Settings | File Templates.
- */
+
 @Entity
 public class Train {
     private int id;
 
-    @javax.persistence.Column(name = "id")
+    @Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -27,7 +21,7 @@ public class Train {
 
     private String name;
 
-    @javax.persistence.Column(name = "name")
+    @Column(name = "name")
     @Basic
     public String getName() {
         return name;
@@ -39,7 +33,7 @@ public class Train {
 
     private int totalSeats;
 
-    @javax.persistence.Column(name = "total_seats")
+    @Column(name = "total_seats")
     @Basic
     public int getTotalSeats() {
         return totalSeats;
@@ -51,7 +45,7 @@ public class Train {
 
     private Timestamp departure;
 
-    @javax.persistence.Column(name = "departure")
+    @Column(name = "departure")
     @Basic
     public Timestamp getDeparture() {
         return departure;

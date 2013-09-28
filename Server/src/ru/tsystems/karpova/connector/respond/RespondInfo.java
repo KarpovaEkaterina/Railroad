@@ -5,34 +5,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class AuthorizationRespondInfo extends RespondInfo implements Serializable{
+public class RespondInfo  implements Serializable{
 
     public final static int OK_STATUS = 0;
-    public final static int WRONG_CREDENTIALS_STATUS = 1;
-    public final static int SERVER_ERROR_STATUS = 2;
+    public final static int SERVER_ERROR_STATUS = -1;
 
     private int status;
-    private int rights;
 
 
-    public AuthorizationRespondInfo(int status, int rights) {
-        super(status);
-        this.rights = rights;
+    public RespondInfo(int status) {
+        this.status = status;
     }
 
-    public int getRights() {
-        return rights;
+    public int getStatus() {
+        return status;
     }
+
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(status);
-        out.writeInt(rights);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         status = in.readInt();
-        rights = in.readInt();
     }
-
-
 }

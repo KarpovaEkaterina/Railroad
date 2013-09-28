@@ -1,15 +1,13 @@
 package ru.tsystems.karpova.connector;
 
 import org.apache.log4j.Logger;
-import ru.tsystems.karpova.connector.reguests.AuthorizationRequestInfo;
-import ru.tsystems.karpova.connector.reguests.RegistrationRequestInfo;
-import ru.tsystems.karpova.connector.respond.AuthorizationRespondInfo;
-import ru.tsystems.karpova.connector.respond.RegistrationRespondInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.text.ParseException;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -18,8 +16,11 @@ public class Client {
     public static final int MAX_LOGIN_ATTEMPTS = 3;
     private static Logger log = Logger.getLogger(Client.class);
     private static int accessLevel = -1;
+    public static final int ACCESS_LEVEL_PASSENGER = 1;
+    public static final int ACCESS_LEVEL_MANAGER = 2;
+    public static final int ACCESS_LEVEL_ADMIN = 3;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
         Properties properties = new Properties();
         properties.load(Client.class.getClassLoader().getResourceAsStream("client.properties"));
 
@@ -35,9 +36,12 @@ public class Client {
             toServer = new ObjectOutputStream(connectionSocket.getOutputStream());
             fromServer = new ObjectInputStream(connectionSocket.getInputStream());
             log.info("Connection created!");
-            while (!start(toServer, fromServer, scanner));
+            while (!start(toServer, fromServer, scanner)) ;
+            while (homePage(toServer, fromServer, scanner)) ;
         } catch (IOException e) {
             log.error("Can't connect to server.", e);
+        } catch (NoSuchElementException e) {
+            log.error("User terminated session", e);
         } finally {
             if (toServer != null) {
                 try {
@@ -65,79 +69,89 @@ public class Client {
 
     private static boolean start(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         System.out.println("1 - registration, 2 - login, 0 - exit");
-        int scan = scanner.nextInt();
-        while (scan != 1 && scan != 2 && scan != 0) {
-            System.out.println("Input 1 or 2");
-            scan = scanner.nextInt();
+        String scan = scanner.next();
+        while (!"1".equals(scan) && !"2".equals(scan) && !"0".equals(scan)) {
+            System.out.println("Input 0, 1 or 2");
+            scan = scanner.next();
         }
-        if (scan == 1) {
-            return registration(scanner, toServer, fromServer);
-        } else if (scan == 2) {
-            return login(scanner, toServer, fromServer);
+
+        if ("1".equals(scan)) {
+            boolean registration = ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_PASSENGER);
+            if (registration) {
+                accessLevel = ACCESS_LEVEL_PASSENGER;
+            }
+            return registration;
+        } else if ("2".equals(scan)) {
+            int accessLevel = ClientLoginHelper.login(scanner, toServer, fromServer);
+            Client.accessLevel = accessLevel;
+            return accessLevel != -1;
         } else {
             return true;
         }
     }
 
-    private static boolean registration(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
-        System.out.println("Input login:");
-        String login = scanner.next();
-        System.out.println("Input password:");
-        String password = scanner.next();
-        RegistrationRequestInfo auth = new RegistrationRequestInfo(login, password);
-        toServer.writeObject(auth);
-
-        RegistrationRespondInfo respond = (RegistrationRespondInfo) fromServer.readObject();
-
-        switch (respond.getStatus()) {
-            case RegistrationRespondInfo.OK_STATUS: {
-                System.out.println("Registration successful");
-                log.debug("Registration successful");
-                return true;
+    private static boolean homePage(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException, ParseException {
+        switch (accessLevel) {
+            case ACCESS_LEVEL_PASSENGER: {
+                return homePageForPassenger(toServer, fromServer, scanner);
             }
-            case RegistrationRespondInfo.SERVER_ERROR_STATUS: {
-                System.out.println("Server error");
-                log.debug("Server error");
-                System.exit(1);
+            case ACCESS_LEVEL_MANAGER: {
+                return homePageForManager(toServer, fromServer, scanner);
             }
-            case RegistrationRespondInfo.DUPLICATED_LOGIN_STATUS: {
-                System.out.println("User with that login already exists");
+            case ACCESS_LEVEL_ADMIN: {
+                return homePageForAdmin(toServer, fromServer, scanner);
+            }
+            default:
                 return false;
-            }
-            default: return false;
         }
     }
 
-    private static boolean login(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
-        System.out.println("Input login:");
-        String login = scanner.next();
-        System.out.println("Input password:");
-        String password = scanner.next();
-        AuthorizationRequestInfo auth = new AuthorizationRequestInfo(login, password);
-        toServer.writeObject(auth);
-
-        AuthorizationRespondInfo respond = (AuthorizationRespondInfo) fromServer.readObject();
-
-        switch (respond.getStatus()) {
-            case AuthorizationRespondInfo.OK_STATUS: {
-                accessLevel = respond.getRights();
-                System.out.println("Connected");
-                log.debug("Authorized");
-                return true;
-            }
-            case AuthorizationRespondInfo.WRONG_CREDENTIALS_STATUS: {
-                System.out.println("Wrong login/password provided");
-                log.debug("Wrong login/password provided");
-                break;
-            }
-            case AuthorizationRespondInfo.SERVER_ERROR_STATUS: {
-                System.out.println("Server error");
-                log.debug("Server error");
-                System.exit(1);
-            }
+    private static boolean homePageForAdmin(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        System.out.println("1 - add user, 0 - exit");
+        String scan = scanner.next();
+        while (!"1".equals(scan) && !"0".equals(scan)) {
+            System.out.println("Input 1 or 0");
+            scan = scanner.next();
         }
-        System.out.println("Login failed!!!");
-        log.debug("Login failed!!!");
+
+        if ("1".equals(scan)) {
+            ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_MANAGER);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) {
         return false;
     }
+
+    private static boolean homePageForPassenger(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws ParseException, IOException, ClassNotFoundException {
+        System.out.println("1 - find train, 2 - timetable by station, 3 - buy ticket, 0 - exit");
+        String scan = scanner.next();
+        while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) && !"0".equals(scan)) {
+            System.out.println("Input 0, 1, 2 or 3");
+            scan = scanner.next();
+        }
+        switch (scan.charAt(0)) {
+            case '1': {
+                UserHomePageHelper.findTrain(toServer, fromServer, scanner);
+                return true;
+            }
+            case '2': {
+                UserHomePageHelper.timetableByStation(toServer, fromServer, scanner);
+                return true;
+            }
+            case '3': {
+                UserHomePageHelper.buyTicket(toServer, fromServer, scanner);
+                return true;
+            }
+            case '0': {
+                return false;
+            }
+            default:
+                return false;
+        }
+    }
+
 }

@@ -6,13 +6,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.Collection;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 21.09.13
- * Time: 11:55
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 public class Station {
     private int id;

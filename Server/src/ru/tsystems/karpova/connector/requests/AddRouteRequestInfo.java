@@ -1,4 +1,4 @@
-package ru.tsystems.karpova.connector.reguests;
+package ru.tsystems.karpova.connector.requests;
 
 /**
  * Created with IntelliJ IDEA.
