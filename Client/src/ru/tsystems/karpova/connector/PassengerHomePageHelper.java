@@ -17,13 +17,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class UserHomePageHelper {
+public class PassengerHomePageHelper {
 
-    private static Logger log = Logger.getLogger(UserHomePageHelper.class);
+    private static Logger log = Logger.getLogger(PassengerHomePageHelper.class);
 
     static boolean buyTicket(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         System.out.println("Input train name:");
         String train = scanner.next();
+        System.out.println("Input departure station:");
+        String stationFrom = scanner.next();
+        System.out.println("Input arrival station:");
+        String stationTo = scanner.next();
         System.out.println("Input firstname:");
         String firstname = scanner.next();
         System.out.println("Input lastname:");
@@ -42,7 +46,7 @@ public class UserHomePageHelper {
             }
         } while (!flag);
 
-        BuyTicketRequestInfo req = new BuyTicketRequestInfo(train, firstname, lastname, birthday);
+        BuyTicketRequestInfo req = new BuyTicketRequestInfo(train, stationFrom, stationTo, firstname, lastname, birthday);
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
@@ -51,11 +55,39 @@ public class UserHomePageHelper {
                 System.out.println("Server error");
                 log.debug("Server error");
                 return false;
-            }else if (o instanceof BuyTicketRespondInfo) {
+            } else if (o instanceof BuyTicketRespondInfo) {
                 BuyTicketRespondInfo respond = (BuyTicketRespondInfo) o;
-
-
-
+                switch (respond.getStatus()) {
+                    case BuyTicketRespondInfo.NO_SEATS_STATUS: {
+                        System.out.println("No seats");
+                        break;
+                    }case BuyTicketRespondInfo.OK_STATUS: {
+                        System.out.println("All right");
+                        break;
+                    }case BuyTicketRespondInfo.PASSENGER_ALREADY_EXISTS_STATUS: {
+                        System.out.println("Passenger already registrant on train");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_DEPARTURE_TIME_STATUS: {
+                        System.out.println("Ticketing has already been closed");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_TRAIN_NAME_STATUS: {
+                        System.out.println("Train not found");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_STATION_FROM_NAME_STATUS: {
+                        System.out.println("Wrong departure station name");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_STATION_TO_NAME_STATUS: {
+                        System.out.println("Wrong arrival station name");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_STATION_TRAIN_STATUS: {
+                        System.out.println("Route hasn't this station(s)");
+                        break;
+                    }case BuyTicketRespondInfo.WRONG_STATION_ORDER_STATUS: {
+                        System.out.println("Wrong departure and arrival stations order");
+                        break;
+                    }
+                }
+                return true;
             }
         }
         log.error("Unknown object type");
@@ -65,7 +97,7 @@ public class UserHomePageHelper {
     static boolean timetableByStation(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         List<String> listAllStation = listStations(toServer, fromServer);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
-        if (listAllStation == null){
+        if (listAllStation == null) {
             return false;
         }
         String station;
@@ -89,7 +121,7 @@ public class UserHomePageHelper {
                 }
 
 
-            }else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");
                 return false;
@@ -101,7 +133,7 @@ public class UserHomePageHelper {
 
     static boolean findTrain(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException, ParseException {
         List<String> listAllStation = listStations(toServer, fromServer);
-        if (listAllStation == null){
+        if (listAllStation == null) {
             return false;
         }
         String stationFrom;
@@ -153,7 +185,7 @@ public class UserHomePageHelper {
                     System.out.println(info.getTrainName() + " --- " + dateFormat.format(info.getDeparture()));
                 }
 
-            }else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");
                 return false;

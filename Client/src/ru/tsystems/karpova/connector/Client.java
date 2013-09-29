@@ -122,8 +122,38 @@ public class Client {
         }
     }
 
-    private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) {
-        return false;
+    private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        System.out.println("1 - add train, 2 - add station, 3 - add route, 4 - registered passengers, 5 - all trains, 6 - sell ticket, 0 - exit");
+        String scan = scanner.next();
+        while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) && !"0".equals(scan)) {
+            System.out.println("Input 0, 1, 2 or 3");
+            scan = scanner.next();
+        }
+        switch (scan.charAt(0)) {
+            case '1': {
+                return ManagerHomePageHelper.addTrain(toServer, fromServer, scanner);
+            }
+            case '2': {
+                return ManagerHomePageHelper.addStation(toServer, fromServer, scanner);
+            }
+            case '3': {
+                return ManagerHomePageHelper.addRoute(toServer, fromServer, scanner);
+            }
+            case '4': {
+                return ManagerHomePageHelper.viewPassenger(toServer, fromServer, scanner);
+            }
+            case '5': {
+                return ManagerHomePageHelper.veiwAllTrains(toServer, fromServer, scanner);
+            }
+            case '6': {
+                return PassengerHomePageHelper.buyTicket(toServer, fromServer, scanner);
+            }
+            case '0': {
+                return false;
+            }
+            default:
+                return false;
+        }
     }
 
     private static boolean homePageForPassenger(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws ParseException, IOException, ClassNotFoundException {
@@ -135,16 +165,13 @@ public class Client {
         }
         switch (scan.charAt(0)) {
             case '1': {
-                UserHomePageHelper.findTrain(toServer, fromServer, scanner);
-                return true;
+                return PassengerHomePageHelper.findTrain(toServer, fromServer, scanner);
             }
             case '2': {
-                UserHomePageHelper.timetableByStation(toServer, fromServer, scanner);
-                return true;
+                return PassengerHomePageHelper.timetableByStation(toServer, fromServer, scanner);
             }
             case '3': {
-                UserHomePageHelper.buyTicket(toServer, fromServer, scanner);
-                return true;
+                return PassengerHomePageHelper.buyTicket(toServer, fromServer, scanner);
             }
             case '0': {
                 return false;

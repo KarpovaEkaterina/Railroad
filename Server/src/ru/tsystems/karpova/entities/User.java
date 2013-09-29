@@ -1,23 +1,21 @@
 package ru.tsystems.karpova.entities;
 
 import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-
+/**
+ * Created with IntelliJ IDEA.
+ * User: Ekaterina
+ * Date: 29.09.13
+ * Time: 17:31
+ * To change this template use File | Settings | File Templates.
+ */
 @Entity
 public class User {
-
-    public static final int ACCESS_LEVEL_PASSENGER = 1;
-    public static final int ACCESS_LEVEL_MANAGER = 2;
-    public static final int ACCESS_LEVEL_ADMIN = 3;
     private int id;
-    private String login;
-    private String password;
-    private int accessLevel;
 
-    @Column(name = "id")
+    @javax.persistence.Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -27,7 +25,9 @@ public class User {
         this.id = id;
     }
 
-    @Column(name = "login")
+    private String login;
+
+    @javax.persistence.Column(name = "login")
     @Basic
     public String getLogin() {
         return login;
@@ -37,7 +37,9 @@ public class User {
         this.login = login;
     }
 
-    @Column(name = "password")
+    private String password;
+
+    @javax.persistence.Column(name = "password")
     @Basic
     public String getPassword() {
         return password;
@@ -47,7 +49,9 @@ public class User {
         this.password = password;
     }
 
-    @Column(name = "access_level")
+    private int accessLevel;
+
+    @javax.persistence.Column(name = "access_level")
     @Basic
     public int getAccessLevel() {
         return accessLevel;

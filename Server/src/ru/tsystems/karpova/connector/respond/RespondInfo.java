@@ -20,8 +20,6 @@ public class RespondInfo  implements Serializable{
     public int getStatus() {
         return status;
     }
-
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(status);
     }

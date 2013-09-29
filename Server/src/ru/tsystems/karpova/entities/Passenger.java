@@ -1,28 +1,31 @@
 package ru.tsystems.karpova.entities;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Collection;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 21.09.13
- * Time: 11:55
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 public class Passenger {
     private int id;
     private String firstname;
     private String lastname;
-    private Date birthday;
+    private Timestamp birthday;
     private Collection<Ticket> ticketsById;
 
-    @javax.persistence.Column(name = "id")
+    public Passenger() {
+    }
+
+    public Passenger(String firstname, String lastname, Timestamp birthday) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.birthday = birthday;
+    }
+
+    @Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -32,7 +35,7 @@ public class Passenger {
         this.id = id;
     }
 
-    @javax.persistence.Column(name = "firstname")
+    @Column(name = "firstname")
     @Basic
     public String getFirstname() {
         return firstname;
@@ -42,7 +45,7 @@ public class Passenger {
         this.firstname = firstname;
     }
 
-    @javax.persistence.Column(name = "lastname")
+    @Column(name = "lastname")
     @Basic
     public String getLastname() {
         return lastname;
@@ -52,13 +55,13 @@ public class Passenger {
         this.lastname = lastname;
     }
 
-    @javax.persistence.Column(name = "birthday")
+    @Column(name = "birthday")
     @Basic
-    public Date getBirthday() {
+    public Timestamp getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(Timestamp birthday) {
         this.birthday = birthday;
     }
 
