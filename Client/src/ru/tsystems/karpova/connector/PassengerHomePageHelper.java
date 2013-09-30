@@ -61,28 +61,36 @@ public class PassengerHomePageHelper {
                     case BuyTicketRespondInfo.NO_SEATS_STATUS: {
                         System.out.println("No seats");
                         break;
-                    }case BuyTicketRespondInfo.OK_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.OK_STATUS: {
                         System.out.println("Ticket bought");
                         break;
-                    }case BuyTicketRespondInfo.PASSENGER_ALREADY_EXISTS_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.PASSENGER_ALREADY_EXISTS_STATUS: {
                         System.out.println("Passenger already registrant on train");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_DEPARTURE_TIME_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_DEPARTURE_TIME_STATUS: {
                         System.out.println("Ticketing has already been closed");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_TRAIN_NAME_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_TRAIN_NAME_STATUS: {
                         System.out.println("Train not found");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_STATION_FROM_NAME_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_STATION_FROM_NAME_STATUS: {
                         System.out.println("Wrong departure station name");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_STATION_TO_NAME_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_STATION_TO_NAME_STATUS: {
                         System.out.println("Wrong arrival station name");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_STATION_TRAIN_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_STATION_TRAIN_STATUS: {
                         System.out.println("Route hasn't this station(s)");
                         break;
-                    }case BuyTicketRespondInfo.WRONG_STATION_ORDER_STATUS: {
+                    }
+                    case BuyTicketRespondInfo.WRONG_STATION_ORDER_STATUS: {
                         System.out.println("Wrong departure and arrival stations order");
                         break;
                     }
@@ -157,6 +165,7 @@ public class PassengerHomePageHelper {
                 dateFrom = dateFormat.parse(scanner.next() + " " + scanner.next());
                 flag = true;
             } catch (ParseException e) {
+                System.out.println("Incorrect date");
                 log.error("Incorrect date");
                 flag = false;
             }
@@ -167,6 +176,7 @@ public class PassengerHomePageHelper {
                 dateTo = dateFormat.parse(scanner.next() + " " + scanner.next());
                 flag = true;
             } catch (ParseException e) {
+                System.out.println("Incorrect date");
                 log.error("Incorrect date");
                 flag = false;
             }
@@ -184,7 +194,7 @@ public class PassengerHomePageHelper {
                 for (FindTrainRespondInfo.TrainInfo info : respond.getTrains()) {
                     System.out.println(info.getTrainName() + " --- " + dateFormat.format(info.getDeparture()));
                 }
-
+                return true;
             } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");

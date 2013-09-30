@@ -27,28 +27,38 @@ public class TrainDAO {
     public static List findTrain(String stationFrom, String stationTo, Date dateFrom, Date dateTo) {
         EntityManager em = emf.createEntityManager();
         log.debug("Start findTrain select");
-        List results = em.createQuery("select t.name,\n" +
-                "(t.departure + SUM(case when wayTime.id = wayA.id then 0 else wayTime.time end)) as startTime\n" +
-                "from Train t \n" +
-                "join t.routeByIdRoute r\n" +
-                "join r.schedulesById scheduleA\n" +
-                "join scheduleA.wayByIdWay wayA\n" +
-                "join wayA.stationByIdStation1 stationA\n" +
-                "join r.schedulesById scheduleB\n" +
-                "join scheduleB.wayByIdWay wayB\n" +
-                "join wayB.stationByIdStation2 stationB\n" +
-                "join r.schedulesById scheduleTime\n" +
-                "join scheduleTime.wayByIdWay wayTime\n" +
+        List results = em.createNativeQuery("select train.name,\n" +
+                "FROM_UNIXTIME(\n" +
+                "UNIX_TIMESTAMP(train.departure)\n" +
+                "+ SUM(\n" +
+                "case\n" +
+                "when wayTime.id = wayA.id\n" +
+                "then 0\n" +
+                "else UNIX_TIMESTAMP(wayTime.time)\n" +
+                "end\n" +
+                ") ) as startTime\n" +
+                "from train\n" +
+                "inner join route on train.id_route = route.id\n" +
+                "inner join schedule as scheduleA on route.id = scheduleA.id_route\n" +
+                "inner join way as wayA on scheduleA.id_way = wayA.id\n" +
+                "inner join station as stationA on wayA.id_station1 = stationA.id\n" +
+                "inner join schedule as scheduleB on route.id = scheduleB.id_route\n" +
+                "inner join way as wayB on scheduleB.id_way = wayB.id\n" +
+                "inner join station as stationB on wayB.id_station2 = stationB.id\n" +
+                "inner join schedule as scheduleTime on route.id = scheduleTime.id_route\n" +
+                "inner join way as wayTime on scheduleTime.id_way = wayTime.id\n" +
                 "where stationA.name = ?\n" +
                 "and stationB.name = ?\n" +
-                "and scheduleA.seqNumber <= scheduleB.seqNumber\n" +
-                "and scheduleTime.seqNumber <= scheduleA.seqNumber\n" +
-                "group by t.name\n")// +
-//                "having col_1_0_ >= ? and col_1_0_ <= ?")
+                "and scheduleA.seq_number < scheduleB.seq_number\n" +
+                "and scheduleTime.seq_number <= scheduleA.seq_number\n" +
+                "group by\n" +
+                "train.name\n" +
+                "having startTime > ? \n" +
+                "and startTime < ? ")
                 .setParameter(1, stationFrom)
                 .setParameter(2, stationTo)
-//                .setParameter(3, dateFrom)
-//                .setParameter(4, dateTo)
+                .setParameter(3, dateFrom)
+                .setParameter(4, dateTo)
                 .getResultList();
         return results;
 
@@ -93,9 +103,9 @@ public class TrainDAO {
                 .setParameter(1, stationFrom.getName())
                 .setParameter(2, train.getName())
                 .getResultList();
-        Timestamp current = (Timestamp) ((Object[])results.get(0))[0];
+        Timestamp current = (Timestamp) ((Object[]) results.get(0))[0];
         current.setTime(current.getTime() + 10 * 60 * 1000);
-        Timestamp departure = (Timestamp) ((Object[])results.get(0))[1];
+        Timestamp departure = (Timestamp) ((Object[]) results.get(0))[1];
         return results.size() == 0 ? false : current.before(departure);
     }
 
@@ -165,19 +175,19 @@ public class TrainDAO {
             if (result.containsKey(obj[0])) {
                 Integer[] a = result.get(obj[0]);
                 a[0] += ((Long) obj[1]).intValue();
-                a[1] += (Integer)obj[2];
-                result.put((Integer) obj[0], new Integer[]{ a[1], a[2], (Integer) obj[3]});
-            }  else {
+                a[1] += (Integer) obj[2];
+                result.put((Integer) obj[0], new Integer[]{a[1], a[2], (Integer) obj[3]});
+            } else {
                 result.put((Integer) obj[0], new Integer[]{((Long) obj[1]).intValue(), (Integer) obj[2], (Integer) obj[3]});
             }
         }
         for (Object[] obj : (List<Object[]>) stationTo) {
             if (result.containsKey(obj[0])) {
                 Integer[] a = result.get(obj[0]);
-                a[0] += (Integer)obj[1];
+                a[0] += (Integer) obj[1];
                 a[1] += ((Long) obj[2]).intValue();
-                result.put((Integer) obj[0], new Integer[]{ a[1], a[2], (Integer) obj[3]});
-            }  else {
+                result.put((Integer) obj[0], new Integer[]{a[1], a[2], (Integer) obj[3]});
+            } else {
                 result.put((Integer) obj[0], new Integer[]{(Integer) obj[1], ((Long) obj[2]).intValue(), (Integer) obj[3]});
             }
         }
