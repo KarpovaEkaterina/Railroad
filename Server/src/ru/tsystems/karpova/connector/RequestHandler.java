@@ -100,11 +100,11 @@ class RequestHandler implements Runnable {
         }
     }
 
-    private void addRoute(ObjectOutputStream toClient, AddRouteRequestInfo addRouteRequest) {
+    private void addRoute(ObjectOutputStream toClient, AddRouteRequestInfo addRouteRequest) throws IOException {
         List<String> stationsForNewRoute = addRouteRequest.getStationsForNewRoute();
         Map<String, Object[]> newWay = addRouteRequest.getNewWay();
         String delimiter = addRouteRequest.getDelimiter();
-        for(String stations : newWay.keySet()){
+        for (String stations : newWay.keySet()) {
             String stationAName = stations.split(delimiter)[0];
             String stationBName = stations.split(delimiter)[1];
             Station stationA = StationDAO.loadStationByName(stationAName);
@@ -114,13 +114,34 @@ class RequestHandler implements Runnable {
             way.setStationByIdStation2(stationB);
             way.setTime((Timestamp) newWay.get(stations)[0]);
             way.setPrice((Double) newWay.get(stations)[1]);
-            WayDAO.saveWay(way);
+            if (!WayDAO.saveWay(way)) {
+                 AddRouteRespondInfo respond = new AddRouteRespondInfo(AddRouteRespondInfo.SERVER_ERROR_STATUS);
+                toClient.writeObject(respond);
+            }
         }
         Route route = new Route();
         route.setName(addRouteRequest.getRouteName());
-        RouteDAO.saveRoute(route);
-        //создать новые schedule!!
-
+        if (!RouteDAO.saveRoute(route)) {
+            AddRouteRespondInfo respond = new AddRouteRespondInfo(AddRouteRespondInfo.SERVER_ERROR_STATUS);
+            toClient.writeObject(respond);
+            return;
+        }
+        List<Schedule> schedules = new ArrayList<Schedule>();
+        route = RouteDAO.loadRoute(route.getName());
+        for (int i = 1; i < stationsForNewRoute.size(); i++) {
+            Way way = WayDAO.loadWayByStations(stationsForNewRoute.get(i - 1), stationsForNewRoute.get(i));
+            Schedule schedule = new Schedule();
+            schedule.setRouteByIdRoute(route);
+            schedule.setWayByIdWay(way);
+            schedule.setSeqNumber(i);
+            schedules.add(schedule);
+            if (!ScheduleDAO.saveSchedule(schedule)) {
+                AddRouteRespondInfo respond = new AddRouteRespondInfo(AddRouteRespondInfo.SERVER_ERROR_STATUS);
+                toClient.writeObject(respond);
+            }
+        }
+        AddRouteRespondInfo respond = new AddRouteRespondInfo(AddRouteRespondInfo.OK_STATUS);
+        toClient.writeObject(respond);
     }
 
     private void getAllWays(ObjectOutputStream toClient) throws IOException {

@@ -1,7 +1,6 @@
 package ru.tsystems.karpova.dao;
 
 import org.apache.log4j.Logger;
-import ru.tsystems.karpova.entities.Station;
 import ru.tsystems.karpova.entities.Way;
 
 import javax.persistence.*;
@@ -46,7 +45,8 @@ public class WayDAO {
     public static Way loadWayByStations(String stationA, String stationB){
         EntityManager em = emf.createEntityManager();
         log.debug("Start loadWayByStations select");
-        List results = em.createQuery("from Way way\n" +
+        List results = em.createQuery("select way\n" +
+                "from Way way\n" +
                 "inner join way.stationByIdStation1 stationA\n" +
                 "inner join way.stationByIdStation2 stationB\n" +
                 "where stationA.name = ?\n" +

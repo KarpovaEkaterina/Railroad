@@ -2,6 +2,9 @@ package ru.tsystems.karpova.connector;
 
 import org.apache.log4j.Logger;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,6 +15,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
+    private static EntityManagerFactory emf = Persistence
+            .createEntityManagerFactory("myapp");
+    public static EntityManager em = emf.createEntityManager();
 
     private static Logger log = Logger.getLogger(Server.class);
 

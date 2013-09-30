@@ -7,6 +7,7 @@ import ru.tsystems.karpova.connector.respond.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -189,12 +190,12 @@ public class ManagerHomePageHelper {
                         flag = false;
                     }
                 } while (!flag);
-                Date time = null;
+                Timestamp time = null;
                 do {
                     try {
-                        System.out.println("Input time");
+                        System.out.println("Input time \"hh:mm\"");
                         DateFormat dateFormat = new SimpleDateFormat("hh:mm");
-                        time = dateFormat.parse(scanner.next());
+                        time = new Timestamp(dateFormat.parse(scanner.next()).getTime());
                         flag = true;
                     } catch (ParseException e) {
                         log.error("Incorrect time");

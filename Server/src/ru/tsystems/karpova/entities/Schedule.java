@@ -1,9 +1,6 @@
 package ru.tsystems.karpova.entities;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -61,7 +58,7 @@ public class Schedule {
     private Route routeByIdRoute;
 
     @ManyToOne
-    @javax.persistence.JoinColumn(name = "id_route", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_route", referencedColumnName = "id", nullable = false)
     public Route getRouteByIdRoute() {
         return routeByIdRoute;
     }
@@ -73,7 +70,7 @@ public class Schedule {
     private Way wayByIdWay;
 
     @ManyToOne
-    @javax.persistence.JoinColumn(name = "id_way", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_way", referencedColumnName = "id", nullable = false)
     public Way getWayByIdWay() {
         return wayByIdWay;
     }

@@ -1,18 +1,9 @@
 package ru.tsystems.karpova.entities;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 29.09.13
- * Time: 17:31
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 public class Route {
     private int id;
