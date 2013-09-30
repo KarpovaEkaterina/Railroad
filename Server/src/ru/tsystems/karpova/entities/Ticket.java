@@ -1,22 +1,16 @@
 package ru.tsystems.karpova.entities;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 29.09.13
- * Time: 17:31
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 public class Ticket {
     private int id;
 
-    @javax.persistence.Column(name = "id")
+    @Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -28,7 +22,7 @@ public class Ticket {
 
     private double price;
 
-    @javax.persistence.Column(name = "price")
+    @Column(name = "price")
     @Basic
     public double getPrice() {
         return price;

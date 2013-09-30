@@ -3,6 +3,7 @@ package ru.tsystems.karpova.dao;
 import org.apache.log4j.Logger;
 import ru.tsystems.karpova.entities.Passenger;
 import ru.tsystems.karpova.entities.Station;
+import ru.tsystems.karpova.entities.Train;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -56,5 +57,19 @@ public class PassengerDAO {
                 .setParameter(3, birthday)
                 .getResultList();
         return results == null || results.isEmpty() ? null : (Passenger) results.get(0);
+    }
+
+    public static List<Passenger> getAllPassengerByTrain(Train train) {
+        EntityManager em = emf.createEntityManager();
+        log.debug("Start getAllPassengerByTrain select");
+        List<Passenger> results = em.createQuery("select passenger\n" +
+                "from Train train\n" +
+                "inner join train.ticketsById ticket\n" +
+                "inner join ticket.passengerByIdPassenger passenger\n" +
+                "where train.name = ?")
+                .setParameter(1, train.getName())
+                .getResultList();
+        return results;
+
     }
 }

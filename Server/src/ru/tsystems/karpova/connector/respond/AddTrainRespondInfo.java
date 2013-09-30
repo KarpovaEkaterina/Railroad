@@ -6,8 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class AddTrainRespondInfo  extends RespondInfo implements Serializable {
-    public final static int OK_STATUS = 0;
-    public final static int SERVER_ERROR_STATUS = 1;
+    public static final int WRONG_ROUTE_NAME_STATUS = 2;
 
     private int status;
 

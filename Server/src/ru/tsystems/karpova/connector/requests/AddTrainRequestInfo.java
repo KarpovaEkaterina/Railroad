@@ -15,7 +15,7 @@ public class AddTrainRequestInfo implements Serializable {
 
     public AddTrainRequestInfo(String trainName, String route, int totalSeats, Date departureTime) {
           this.trainName = trainName;
-          this.trainName = trainName;
+          this.route = route;
           this.totalSeats = totalSeats;
           this.departureTime = departureTime;
     }
@@ -39,7 +39,7 @@ public class AddTrainRequestInfo implements Serializable {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(trainName);
         out.writeObject(route);
-        out.writeObject(totalSeats);
+        out.writeInt(totalSeats);
         out.writeObject(departureTime);
     }
 

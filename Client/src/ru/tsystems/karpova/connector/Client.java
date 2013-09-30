@@ -125,8 +125,9 @@ public class Client {
     private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         System.out.println("1 - add train, 2 - add station, 3 - add route, 4 - registered passengers, 5 - all trains, 6 - sell ticket, 0 - exit");
         String scan = scanner.next();
-        while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) && !"0".equals(scan)) {
-            System.out.println("Input 0, 1, 2 or 3");
+        while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) &&
+                !"4".equals(scan) && !"5".equals(scan) && !"6".equals(scan) && !"0".equals(scan)) {
+            System.out.println("Input 0, 1, 2, 3, 4, 5 or 6");
             scan = scanner.next();
         }
         switch (scan.charAt(0)) {
@@ -140,7 +141,7 @@ public class Client {
                 return ManagerHomePageHelper.addRoute(toServer, fromServer, scanner);
             }
             case '4': {
-                return ManagerHomePageHelper.viewPassenger(toServer, fromServer, scanner);
+                return ManagerHomePageHelper.viewPassengerByTrain(toServer, fromServer, scanner);
             }
             case '5': {
                 return ManagerHomePageHelper.veiwAllTrains(toServer, fromServer, scanner);

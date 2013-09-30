@@ -12,6 +12,7 @@ public class BuyTicketRespondInfo extends RespondInfo implements Serializable {
     public static final int WRONG_STATION_TRAIN_STATUS = 9;
     public static final int WRONG_DEPARTURE_TIME_STATUS = 10;
     public static final int WRONG_STATION_ORDER_STATUS = 11;
+    public static final int CAN_NOT_SAVE_NEW_USER_STATUS = 5;
 
     public BuyTicketRespondInfo(int status) {
         super(status);

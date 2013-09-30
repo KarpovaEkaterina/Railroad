@@ -62,7 +62,7 @@ public class PassengerHomePageHelper {
                         System.out.println("No seats");
                         break;
                     }case BuyTicketRespondInfo.OK_STATUS: {
-                        System.out.println("All right");
+                        System.out.println("Ticket bought");
                         break;
                     }case BuyTicketRespondInfo.PASSENGER_ALREADY_EXISTS_STATUS: {
                         System.out.println("Passenger already registrant on train");

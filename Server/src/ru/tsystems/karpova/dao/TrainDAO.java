@@ -5,9 +5,7 @@ import ru.tsystems.karpova.entities.Passenger;
 import ru.tsystems.karpova.entities.Station;
 import ru.tsystems.karpova.entities.Train;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +94,7 @@ public class TrainDAO {
                 .setParameter(2, train.getName())
                 .getResultList();
         Timestamp current = (Timestamp) ((Object[])results.get(0))[0];
-        current.setTime(current.getTime() - 10 * 60 * 1000);
+        current.setTime(current.getTime() + 10 * 60 * 1000);
         Timestamp departure = (Timestamp) ((Object[])results.get(0))[1];
         return results.size() == 0 ? false : current.before(departure);
     }
@@ -205,6 +203,33 @@ public class TrainDAO {
                 .setParameter(1, train.getName())
                 .getResultList();
         return results;
+    }
+
+    public static boolean saveNewTrain(Train train) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction trx = em.getTransaction();
+        try {
+            trx.begin();
+
+            em.persist(train);
+
+            trx.commit();
+            log.debug("Saving train");
+            return true;
+        } catch (RollbackException e) {
+            log.error("Can't save train", e);
+            trx.rollback();
+            return false;
+        }
+
+    }
+
+    public static List<Train> getAllTrains() {
+        EntityManager em = emf.createEntityManager();
+        log.debug("Start getAllTrains select");
+        List<Train> results = em.createQuery("from Train ").getResultList();
+        return results;
+
     }
 
 //        public static void main(String[] args) {

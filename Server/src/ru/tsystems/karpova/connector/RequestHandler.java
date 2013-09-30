@@ -4,10 +4,7 @@ import org.apache.log4j.Logger;
 import ru.tsystems.karpova.connector.requests.*;
 import ru.tsystems.karpova.connector.respond.*;
 import ru.tsystems.karpova.dao.*;
-import ru.tsystems.karpova.entities.Passenger;
-import ru.tsystems.karpova.entities.Route;
-import ru.tsystems.karpova.entities.Station;
-import ru.tsystems.karpova.entities.Train;
+import ru.tsystems.karpova.entities.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class RequestHandler implements Runnable {
     Socket connectionSocket;
@@ -54,7 +52,17 @@ class RequestHandler implements Runnable {
                 } else if (o instanceof GetAllRoutesRequestInfo) {
                     getAllRoutes(toClient);
                 } else if (o instanceof AddTrainRequestInfo) {
-                    addTrain(toClient,(AddTrainRequestInfo) o);
+                    addTrain(toClient, (AddTrainRequestInfo) o);
+                } else if (o instanceof AddStationRequestInfo) {
+                    addStation(toClient, (AddStationRequestInfo) o);
+                } else if (o instanceof GetAllTrainsRequestInfo) {
+                    getAllTrains(toClient);
+                } else if (o instanceof ViewPassengerByTrainRequestInfo) {
+                    viewPassengerByTrain(toClient, (ViewPassengerByTrainRequestInfo) o);
+                } else if (o instanceof GetAllWaysRequestInfo) {
+                    getAllWays(toClient);
+                } else if (o instanceof AddRouteRequestInfo) {
+                    addRoute(toClient, (AddRouteRequestInfo) o);
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -92,7 +100,98 @@ class RequestHandler implements Runnable {
         }
     }
 
-    private void addTrain(ObjectOutputStream toClient, AddTrainRequestInfo requestInfo) {
+    private void addRoute(ObjectOutputStream toClient, AddRouteRequestInfo addRouteRequest) {
+        List<String> stationsForNewRoute = addRouteRequest.getStationsForNewRoute();
+        Map<String, Object[]> newWay = addRouteRequest.getNewWay();
+        String delimiter = addRouteRequest.getDelimiter();
+        for(String stations : newWay.keySet()){
+            String stationAName = stations.split(delimiter)[0];
+            String stationBName = stations.split(delimiter)[1];
+            Station stationA = StationDAO.loadStationByName(stationAName);
+            Station stationB = StationDAO.loadStationByName(stationBName);
+            Way way = new Way();
+            way.setStationByIdStation1(stationA);
+            way.setStationByIdStation2(stationB);
+            way.setTime((Timestamp) newWay.get(stations)[0]);
+            way.setPrice((Double) newWay.get(stations)[1]);
+            WayDAO.saveWay(way);
+        }
+        Route route = new Route();
+        route.setName(addRouteRequest.getRouteName());
+        RouteDAO.saveRoute(route);
+        //создать новые schedule!!
+
+    }
+
+    private void getAllWays(ObjectOutputStream toClient) throws IOException {
+        List<Object[]> allWaysList = WayDAO.getAllWays();
+        Map<String, Object[]> allWays = new HashMap<String, Object[]>();
+        final String delimiter = "_%DELIM%_";
+        for (Object[] way : allWaysList) {
+            allWays.put(way[0] + delimiter + way[1], new Object[]{way[2], way[3]});
+        }
+        GetAllWaysRespondInfo respond = new GetAllWaysRespondInfo(allWays, delimiter);
+        toClient.writeObject(respond);
+    }
+
+    private void viewPassengerByTrain(ObjectOutputStream toClient, ViewPassengerByTrainRequestInfo viewPassengerByTrainRequest) throws IOException {
+        Train train = TrainDAO.loadTrain(viewPassengerByTrainRequest.getTrainName());
+        if (train == null) {
+            ViewPassengerByTrainRespondInfo respond = new ViewPassengerByTrainRespondInfo(ViewPassengerByTrainRespondInfo.WRONG_TRAIN_NAME_STATUS);
+            toClient.writeObject(respond);
+            return;
+        }
+        List<Passenger> allPassengerByTrainList = PassengerDAO.getAllPassengerByTrain(train);
+        List<Object[]> allPassengerByTrain = new ArrayList<Object[]>();
+        for (Passenger passenger : allPassengerByTrainList) {
+            allPassengerByTrain.add(new Object[]{passenger.getFirstname(), passenger.getLastname(), passenger.getBirthday()});
+        }
+        ViewPassengerByTrainRespondInfo respond = new ViewPassengerByTrainRespondInfo(allPassengerByTrain);
+        toClient.writeObject(respond);
+    }
+
+    private void getAllTrains(ObjectOutputStream toClient) throws IOException {
+        List<Train> allTrainsList = TrainDAO.getAllTrains();
+        List<Object[]> allTrains = new ArrayList<Object[]>();
+        for (Train train : allTrainsList) {
+            allTrains.add(new Object[]{train.getName(), train.getTotalSeats(), train.getDeparture(), train.getRouteByIdRoute().getName()});
+        }
+        GetAllTrainsRespondInfo respond = new GetAllTrainsRespondInfo(allTrains);
+        toClient.writeObject(respond);
+    }
+
+    private void addStation(ObjectOutputStream toClient, AddStationRequestInfo addStationRequest) throws IOException {
+        Station station = new Station(addStationRequest.getStationName());
+        if (!StationDAO.saveNewStation(station)) {
+            AddStationRespondInfo respond = new AddStationRespondInfo(AddStationRespondInfo.SERVER_ERROR_STATUS);
+            toClient.writeObject(respond);
+            return;
+        } else {
+            AddStationRespondInfo respond = new AddStationRespondInfo(AddStationRespondInfo.OK_STATUS);
+            toClient.writeObject(respond);
+            return;
+        }
+
+    }
+
+    private void addTrain(ObjectOutputStream toClient, AddTrainRequestInfo addTrainRequest) throws IOException {
+        Route route = RouteDAO.loadRoute(addTrainRequest.getRoute());
+        if (route == null) {
+            AddTrainRespondInfo respond = new AddTrainRespondInfo(AddTrainRespondInfo.WRONG_ROUTE_NAME_STATUS);
+            toClient.writeObject(respond);
+            return;
+        }
+        Train train = new Train(addTrainRequest.getTrainName(), addTrainRequest.getTotalSeats(),
+                new Timestamp(addTrainRequest.getDepartureTime().getTime()), route);
+        if (!TrainDAO.saveNewTrain(train)) {
+            AddTrainRespondInfo respond = new AddTrainRespondInfo(AddTrainRespondInfo.SERVER_ERROR_STATUS);
+            toClient.writeObject(respond);
+            return;
+        } else {
+            AddTrainRespondInfo respond = new AddTrainRespondInfo(AddTrainRespondInfo.OK_STATUS);
+            toClient.writeObject(respond);
+            return;
+        }
     }
 
     private void buyTicket(ObjectOutputStream toClient, BuyTicketRequestInfo buyTicketRequest) throws IOException {
@@ -101,7 +200,11 @@ class RequestHandler implements Runnable {
         if (passenger == null) {
             passenger = new Passenger(buyTicketRequest.getFirstname(),
                     buyTicketRequest.getLastname(), new Timestamp(buyTicketRequest.getBirthday().getTime()));
-            PassengerDAO.saveNewPassenger(passenger);
+            if (!PassengerDAO.saveNewPassenger(passenger)) {
+                BuyTicketRespondInfo respond = new BuyTicketRespondInfo(BuyTicketRespondInfo.SERVER_ERROR_STATUS);
+                toClient.writeObject(respond);
+                return;
+            }
         }
         Train train = TrainDAO.loadTrain(buyTicketRequest.getTrain());
         if (train == null) {
@@ -132,7 +235,7 @@ class RequestHandler implements Runnable {
             toClient.writeObject(respond);
             return;
         }
-        if(!TrainDAO.checkDepartureTime(train, stationFrom)) {
+        if (!TrainDAO.checkDepartureTime(train, stationFrom)) {
             BuyTicketRespondInfo respond = new BuyTicketRespondInfo(BuyTicketRespondInfo.WRONG_DEPARTURE_TIME_STATUS);
             toClient.writeObject(respond);
             return;
