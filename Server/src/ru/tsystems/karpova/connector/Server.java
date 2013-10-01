@@ -15,9 +15,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
-    private static EntityManagerFactory emf = Persistence
-            .createEntityManagerFactory("myapp");
-    public static EntityManager em = emf.createEntityManager();
 
     private static Logger log = Logger.getLogger(Server.class);
 

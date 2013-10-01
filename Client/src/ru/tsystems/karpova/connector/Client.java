@@ -13,7 +13,6 @@ import java.util.Scanner;
 
 public class Client {
 
-    public static final int MAX_LOGIN_ATTEMPTS = 3;
     private static Logger log = Logger.getLogger(Client.class);
     private static int accessLevel = -1;
     public static final int ACCESS_LEVEL_PASSENGER = 1;
@@ -68,6 +67,7 @@ public class Client {
     }
 
     private static boolean start(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start method \"start\"");
         System.out.println("1 - registration, 2 - login, 0 - exit");
         String scan = scanner.next();
         while (!"1".equals(scan) && !"2".equals(scan) && !"0".equals(scan)) {
@@ -77,12 +77,15 @@ public class Client {
 
         if ("1".equals(scan)) {
             boolean registration = ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_PASSENGER);
+            log.debug("Method \"registration\" returned " + registration);
             if (registration) {
+                log.info("Set accessLevel = ACCESS_LEVEL_PASSENGER");
                 accessLevel = ACCESS_LEVEL_PASSENGER;
             }
             return registration;
         } else if ("2".equals(scan)) {
             int accessLevel = ClientLoginHelper.login(scanner, toServer, fromServer);
+            log.debug("Method \"login\" returned " + accessLevel);
             Client.accessLevel = accessLevel;
             return accessLevel != -1;
         } else {
@@ -108,12 +111,12 @@ public class Client {
 
     private static boolean homePageForAdmin(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         System.out.println("1 - add user, 0 - exit");
+        log.debug("Start method \"homePageForAdmin\"");
         String scan = scanner.next();
         while (!"1".equals(scan) && !"0".equals(scan)) {
             System.out.println("Input 1 or 0");
             scan = scanner.next();
         }
-
         if ("1".equals(scan)) {
             ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_MANAGER);
             return true;
@@ -123,6 +126,7 @@ public class Client {
     }
 
     private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start method \"homePageForManager\"");
         System.out.println("1 - add train, 2 - add station, 3 - add route, 4 - registered passengers, 5 - all trains, 6 - sell ticket, 0 - exit");
         String scan = scanner.next();
         while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) &&
@@ -158,6 +162,7 @@ public class Client {
     }
 
     private static boolean homePageForPassenger(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws ParseException, IOException, ClassNotFoundException {
+        log.debug("Start method \"homePageForPassenger\"");
         System.out.println("1 - find train, 2 - timetable by station, 3 - buy ticket, 0 - exit");
         String scan = scanner.next();
         while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) && !"0".equals(scan)) {

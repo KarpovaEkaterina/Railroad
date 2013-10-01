@@ -26,6 +26,7 @@ public class WayDAO {
 
     public static boolean saveWay(Way way) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveWay");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

@@ -18,6 +18,7 @@ public class ManagerHomePageHelper {
     private static Logger log = Logger.getLogger(ManagerHomePageHelper.class);
 
     public static boolean addTrain(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start \"addTrain\" method");
         List<String> listAllRoute = listRoute(toServer, fromServer);
         System.out.println("Input train name:");
         String trainName = scanner.next();
@@ -49,12 +50,18 @@ public class ManagerHomePageHelper {
         } while (!flag);
 
         AddTrainRequestInfo req = new AddTrainRequestInfo(trainName, route, totalSeats, departureTime);
+        log.debug("Send AddTrainRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof AddTrainRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof AddTrainRespondInfo) {
                 AddTrainRespondInfo respond = (AddTrainRespondInfo) o;
+                log.debug("Received AddTrainRespondInfo from server");
 
                 switch (respond.getStatus()) {
                     case AddTrainRespondInfo.OK_STATUS: {
@@ -69,11 +76,6 @@ public class ManagerHomePageHelper {
                     }
                 }
                 return true;
-
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");
@@ -81,13 +83,20 @@ public class ManagerHomePageHelper {
     }
 
     private static List<String> listRoute(ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
+        log.debug("Start \"listRoute\" method");
         GetAllRoutesRequestInfo req = new GetAllRoutesRequestInfo();
+        log.debug("Send GetAllRoutesRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof GetAllRoutesRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return null;
+            } else if (o instanceof GetAllRoutesRespondInfo) {
                 GetAllRoutesRespondInfo respond = (GetAllRoutesRespondInfo) o;
+                log.debug("Received GetAllRoutesRespondInfo from server");
 
                 List<String> allRoutes = respond.getListAllRoutes();
                 System.out.println("Routes:");
@@ -97,10 +106,6 @@ public class ManagerHomePageHelper {
                 log.debug("Get all routes");
                 return allRoutes;
 
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return null;
             }
         }
         log.error("Unknown object type");
@@ -108,6 +113,7 @@ public class ManagerHomePageHelper {
     }
 
     public static boolean addStation(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start \"addStation\" method");
         List<String> listAllStation = PassengerHomePageHelper.listStations(toServer, fromServer);
         String stationName;
         do {
@@ -117,12 +123,18 @@ public class ManagerHomePageHelper {
         } while (listAllStation.contains(stationName));
 
         AddStationRequestInfo req = new AddStationRequestInfo(stationName);
+        log.debug("Send AddStationRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof AddStationRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof AddStationRespondInfo) {
                 AddStationRespondInfo respond = (AddStationRespondInfo) o;
+                log.debug("Received AddStationRespondInfo from server");
 
                 if (respond.getStatus() == AddStationRespondInfo.OK_STATUS) {
                     System.out.println("Station added");
@@ -133,10 +145,6 @@ public class ManagerHomePageHelper {
                     log.debug("Server error");
                     return false;
                 }
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");
@@ -144,6 +152,7 @@ public class ManagerHomePageHelper {
     }
 
     public static boolean addRoute(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start \"addRoute\" method");
         List<String> listAllRoute = listRoute(toServer, fromServer);
         Map<String, Object[]> ways = listWays(toServer, fromServer);
         String routeName;
@@ -208,27 +217,24 @@ public class ManagerHomePageHelper {
         } while (!station.equals("end"));
 
         AddRouteRequestInfo req = new AddRouteRequestInfo(delimiter, routeName, stationsForNewRoute, newWay);
+        log.debug("Send AddRouteRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof AddRouteRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof AddRouteRespondInfo) {
                 AddRouteRespondInfo respond = (AddRouteRespondInfo) o;
+                log.debug("Received AddRouteRespondInfo from server");
 
                 if (respond.getStatus() == AddRouteRespondInfo.OK_STATUS) {
                     System.out.println("Route added");
                     log.debug("Route added");
                     return true;
-                } else {
-                    System.out.println("Server error");
-                    log.debug("Server error");
-                    return false;
                 }
-
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");
@@ -238,20 +244,23 @@ public class ManagerHomePageHelper {
     private static String delimiter = "";
 
     private static Map<String, Object[]> listWays(ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
+        log.debug("Start \"listWays\" method");
         GetAllWaysRequestInfo req = new GetAllWaysRequestInfo();
+        log.debug("Send GetAllWaysRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof GetAllWaysRespondInfo) {
-                GetAllWaysRespondInfo respond = (GetAllWaysRespondInfo) o;
-                delimiter = respond.getDelimiter();
-                return respond.getListAllWays();
-
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");
                 return null;
+            } else if (o instanceof GetAllWaysRespondInfo) {
+                GetAllWaysRespondInfo respond = (GetAllWaysRespondInfo) o;
+                log.debug("Received GetAllWaysRespondInfo from server");
+                delimiter = respond.getDelimiter();
+                return respond.getListAllWays();
+
             }
         }
         log.error("Unknown object type");
@@ -259,15 +268,22 @@ public class ManagerHomePageHelper {
     }
 
     public static boolean viewPassengerByTrain(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start \"viewPassengerByTrain\" method");
         System.out.println("Input train name");
         String trainName = scanner.next();
         ViewPassengerByTrainRequestInfo request = new ViewPassengerByTrainRequestInfo(trainName);
+        log.debug("Send ViewPassengerByTrainRequestInfo to server");
         toServer.writeObject(request);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof ViewPassengerByTrainRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof ViewPassengerByTrainRespondInfo) {
                 ViewPassengerByTrainRespondInfo respond = (ViewPassengerByTrainRespondInfo) o;
+                log.debug("Received ViewPassengerByTrainRespondInfo from server");
 
                 if (respond.getStatus() == ViewPassengerByTrainRespondInfo.WRONG_TRAIN_NAME_STATUS) {
                     System.out.println("Wrong train name");
@@ -285,11 +301,6 @@ public class ManagerHomePageHelper {
                 }
                 log.debug("Get all passenger");
                 return true;
-
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");
@@ -297,13 +308,20 @@ public class ManagerHomePageHelper {
     }
 
     public static boolean veiwAllTrains(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
+        log.debug("Start \"veiwAllTrains\" method");
         GetAllTrainsRequestInfo req = new GetAllTrainsRequestInfo();
+        log.debug("Send GetAllTrainsRequestInfo to server");
         toServer.writeObject(req);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof GetAllTrainsRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof GetAllTrainsRespondInfo) {
                 GetAllTrainsRespondInfo respond = (GetAllTrainsRespondInfo) o;
+                log.debug("Received GetAllTrainsRespondInfo from server");
 
                 List<Object[]> allTrains = respond.getListAllTrains();
                 System.out.println("Trains:");
@@ -316,11 +334,6 @@ public class ManagerHomePageHelper {
                 }
                 log.debug("Get all trains");
                 return true;
-
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");

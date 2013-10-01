@@ -18,6 +18,7 @@ public class PassengerDAO {
 
     public static boolean isAlreadyExistPassenger(Passenger passenger) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start isAlreadyExistPassenger select");
         List results = em.createQuery("select count(*)\n" +
                 "from Passenger passenger \n" +
                 "where passenger.firstname = ?\n" +
@@ -32,6 +33,7 @@ public class PassengerDAO {
 
     public static boolean saveNewPassenger(Passenger passenger) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveNewPassenger");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
@@ -48,9 +50,9 @@ public class PassengerDAO {
         }
     }
 
-
     public static Passenger loadPassenger(String firstname, String lastname, Date birthday) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start loadPassenger select");
         List results = em.createQuery("from Passenger where firstname = ? and lastname = ? and birthday = ?")
                 .setParameter(1, firstname)
                 .setParameter(2, lastname)

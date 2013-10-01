@@ -20,7 +20,6 @@ public class StationDAO {
         return results;
     }
 
-
     public static Station loadStationByName(String name) {
         EntityManager em = emf.createEntityManager();
         log.debug("Start loadStationByName select");
@@ -28,8 +27,9 @@ public class StationDAO {
         return results == null || results.isEmpty() ? null : (Station) results.get(0);
     }
 
-    public static boolean saveNewStation(Station station) {
+    public static boolean saveStation(Station station) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveStation");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

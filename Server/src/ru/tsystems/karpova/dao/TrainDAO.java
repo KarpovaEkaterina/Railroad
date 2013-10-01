@@ -20,6 +20,7 @@ public class TrainDAO {
 
     public static Train loadTrain(String trainName) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start loadTrain select");
         List results = em.createQuery("from Train where name=?").setParameter(1, trainName).getResultList();
         return results == null || results.isEmpty() ? null : (Train) results.get(0);
     }
@@ -86,7 +87,7 @@ public class TrainDAO {
 
     public static boolean checkDepartureTime(Train train, Station stationFrom) {
         EntityManager em = emf.createEntityManager();
-        log.debug("Start findTrainByStation select");
+        log.debug("Start checkDepartureTime select");
         List results = em.createQuery("select current_timestamp, \n" +
                 "(t.departure + SUM(case when wayTime.id = wayA.id then 0 else wayTime.time end)) as departureTime \n" +
                 "from Train t \n" +
@@ -107,19 +108,6 @@ public class TrainDAO {
         current.setTime(current.getTime() + 10 * 60 * 1000);
         Timestamp departure = (Timestamp) ((Object[]) results.get(0))[1];
         return results.size() == 0 ? false : current.before(departure);
-    }
-
-    public static Integer freeSeatsOnTrain(String train, String stationFrom, String stationTo) {
-        EntityManager em = emf.createEntityManager();
-        List results = em.createQuery("select t.totalSeats - count(ticket.id)\n" +
-                "from Train t \n" +
-                "inner join t.ticketsById ticket\n" +
-                "where t.name = ?\n" +
-                "group by t.id" +
-                "")
-                .setParameter(1, train)
-                .getResultList();
-        return results.size() == 1 ? (Integer) results.get(0) : -1;
     }
 
     public static boolean isAlreadyExistPassengerOnTrain(Train train, Passenger passenger) {
@@ -215,8 +203,9 @@ public class TrainDAO {
         return results;
     }
 
-    public static boolean saveNewTrain(Train train) {
+    public static boolean saveTrain(Train train) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveTrain");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
@@ -241,11 +230,4 @@ public class TrainDAO {
         return results;
 
     }
-
-//        public static void main(String[] args) {
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        List trains = findTrain("Nvk", "SPb", dateFormat.parse("2013-07-19") , dateFormat.parse("2013-10-19"));
-//        System.out.println(trains.size());
-//            System.out.println(countOfPassengerOnEveryStation("777"));
-//    }
 }

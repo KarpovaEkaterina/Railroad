@@ -24,6 +24,7 @@ public class AddRouteRequestInfo implements Serializable {
         this.newWay = newWay;
         this.delimiter = delimiter;
     }
+
     public String getRouteName() {
         return routeName;
     }

@@ -19,18 +19,25 @@ public class ClientLoginHelper {
     private static Logger log = Logger.getLogger(ClientLoginHelper.class);
 
     static boolean registration(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer, int accessLevel) throws IOException, ClassNotFoundException {
+        log.debug("Start \"registration\" method");
         System.out.println("Input login:");
         String login = scanner.next();
         System.out.println("Input password:");
         String password = scanner.next();
         RegistrationRequestInfo reg = new RegistrationRequestInfo(login, password, accessLevel);
+        log.debug("Send RegistrationRequestInfo to server");
         toServer.writeObject(reg);
 
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof RegistrationRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return false;
+            } else if (o instanceof RegistrationRespondInfo) {
                 RegistrationRespondInfo respond = (RegistrationRespondInfo) o;
+                log.debug("Received RegistrationRespondInfo from server");
 
                 switch (respond.getStatus()) {
                     case RegistrationRespondInfo.OK_STATUS: {
@@ -38,22 +45,14 @@ public class ClientLoginHelper {
                         log.debug("Registration successful");
                         return true;
                     }
-                    case RegistrationRespondInfo.SERVER_ERROR_STATUS: {
-                        System.out.println("Server error");
-                        log.debug("Server error");
-                        return false;
-                    }
                     case RegistrationRespondInfo.DUPLICATED_LOGIN_STATUS: {
                         System.out.println("User with that login already exists");
+                        log.debug("Duplicated login");
                         return true;
                     }
                     default:
                         return false;
                 }
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return false;
             }
         }
         log.error("Unknown object type");
@@ -62,17 +61,24 @@ public class ClientLoginHelper {
 
     static int login(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer) throws
             IOException, ClassNotFoundException {
+        log.debug("Start \"login\" method");
         System.out.println("Input login:");
         String login = scanner.next();
         System.out.println("Input password:");
         String password = scanner.next();
         AuthorizationRequestInfo auth = new AuthorizationRequestInfo(login, password);
+        log.debug("Send AuthorizationRequestInfo to server");
         toServer.writeObject(auth);
 
         Object o = fromServer.readObject();
         if (o instanceof RespondInfo) {
-            if (o instanceof AuthorizationRespondInfo) {
+            if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
+                System.out.println("Server error");
+                log.debug("Server error");
+                return SERVER_ERROR_RETURN_CODE;
+            } else if (o instanceof AuthorizationRespondInfo) {
                 AuthorizationRespondInfo respond = (AuthorizationRespondInfo) o;
+                log.debug("Received AuthorizationRespondInfo from server");
 
                 switch (respond.getStatus()) {
                     case AuthorizationRespondInfo.OK_STATUS: {
@@ -85,16 +91,7 @@ public class ClientLoginHelper {
                         log.debug("Wrong login/password provided");
                         break;
                     }
-                    case AuthorizationRespondInfo.SERVER_ERROR_STATUS: {
-                        System.out.println("Server error");
-                        log.debug("Server error");
-                        return SERVER_ERROR_RETURN_CODE;
-                    }
                 }
-            } else if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
-                System.out.println("Server error");
-                log.debug("Server error");
-                return SERVER_ERROR_RETURN_CODE;
             }
             System.out.println("Login failed!!!");
             log.debug("Login failed!!!");

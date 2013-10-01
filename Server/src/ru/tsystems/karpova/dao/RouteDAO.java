@@ -31,6 +31,7 @@ public class RouteDAO {
 
     public static boolean saveRoute(Route route) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveRoute");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

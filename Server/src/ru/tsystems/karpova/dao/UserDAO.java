@@ -15,6 +15,7 @@ public class UserDAO {
 
     public static boolean saveUser(User user) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveUser");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
@@ -33,14 +34,8 @@ public class UserDAO {
 
     public static User loadUserByLogin(String login) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start loadUserByLogin select");
         List results = em.createQuery("from User where login=?").setParameter(1, login).getResultList();
         return results == null || results.isEmpty() ? null : (User) results.get(0);
-    }
-
-    public static boolean isExistClient(User user) {
-        EntityManager em = emf.createEntityManager();
-        List results = em.createQuery("from User where login=? and password=?")
-                .setParameter(1, user.getLogin()).setParameter(2, user.getPassword()).getResultList();
-        return results != null && results.size() > 0;
     }
 }

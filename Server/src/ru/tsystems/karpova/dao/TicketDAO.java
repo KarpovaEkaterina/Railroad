@@ -15,15 +15,9 @@ public class TicketDAO {
     private static EntityManagerFactory emf = Persistence
             .createEntityManagerFactory("myapp");
 
-    public static boolean buyTicket(Train train, Passenger passenger, Station stationFrom, Station stationTo) {
-        Ticket ticket = new Ticket();
-        ticket.setTrainByIdTrain(train);
-        ticket.setPassengerByIdPassenger(passenger);
-        ticket.setStationByStationFrom(stationFrom);
-        ticket.setStationByStationTo(stationTo);
-        ticket.setPrice(100);
-
+    public static boolean saveTicket(Ticket ticket) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveTicket");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

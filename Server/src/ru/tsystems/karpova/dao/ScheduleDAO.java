@@ -14,6 +14,7 @@ public class ScheduleDAO {
 
     public static boolean saveSchedule(Schedule schedule) {
         EntityManager em = emf.createEntityManager();
+        log.debug("Start saveSchedule");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
