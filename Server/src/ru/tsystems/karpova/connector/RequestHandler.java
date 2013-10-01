@@ -112,7 +112,7 @@ class RequestHandler implements Runnable {
         }
     }
 
-    private void addRoute(ObjectOutputStream toClient, AddRouteRequestInfo addRouteRequest) throws IOException {
+    public void addRoute(ObjectOutputStream toClient, AddRouteRequestInfo addRouteRequest) throws IOException {
         log.debug("Start method \"addRoute\"");
         List<String> stationsForNewRoute = addRouteRequest.getStationsForNewRoute();
         Map<String, Object[]> newWay = addRouteRequest.getNewWay();
@@ -161,7 +161,7 @@ class RequestHandler implements Runnable {
         toClient.writeObject(respond);
     }
 
-    private void getAllWays(ObjectOutputStream toClient) throws IOException {
+    public void getAllWays(ObjectOutputStream toClient) throws IOException {
         log.debug("Start method \"getAllWays\"");
         List<Object[]> allWaysList = WayDAO.getAllWays();
         Map<String, Object[]> allWays = new HashMap<String, Object[]>();
@@ -174,7 +174,7 @@ class RequestHandler implements Runnable {
         toClient.writeObject(respond);
     }
 
-    private void viewPassengerByTrain(ObjectOutputStream toClient, ViewPassengerByTrainRequestInfo viewPassengerByTrainRequest) throws IOException {
+    public void viewPassengerByTrain(ObjectOutputStream toClient, ViewPassengerByTrainRequestInfo viewPassengerByTrainRequest) throws IOException {
         log.debug("Start method \"viewPassengerByTrain\"");
         Train train = TrainDAO.loadTrain(viewPassengerByTrainRequest.getTrainName());
         if (train == null) {
@@ -193,7 +193,7 @@ class RequestHandler implements Runnable {
         toClient.writeObject(respond);
     }
 
-    private void getAllTrains(ObjectOutputStream toClient) throws IOException {
+    public void getAllTrains(ObjectOutputStream toClient) throws IOException {
         log.debug("Start method \"getAllTrains\"");
         List<Train> allTrainsList = TrainDAO.getAllTrains();
         List<Object[]> allTrains = new ArrayList<Object[]>();
@@ -205,7 +205,7 @@ class RequestHandler implements Runnable {
         toClient.writeObject(respond);
     }
 
-    private void addStation(ObjectOutputStream toClient, AddStationRequestInfo addStationRequest) throws IOException {
+    public void addStation(ObjectOutputStream toClient, AddStationRequestInfo addStationRequest) throws IOException {
         log.debug("Start method \"addStation\"");
         Station station = new Station(addStationRequest.getStationName());
         if (!StationDAO.saveStation(station)) {
@@ -222,7 +222,7 @@ class RequestHandler implements Runnable {
 
     }
 
-    private void addTrain(ObjectOutputStream toClient, AddTrainRequestInfo addTrainRequest) throws IOException {
+    public void addTrain(ObjectOutputStream toClient, AddTrainRequestInfo addTrainRequest) throws IOException {
         log.debug("Start method \"addTrain\"");
         Route route = RouteDAO.loadRoute(addTrainRequest.getRoute());
         if (route == null) {
@@ -246,7 +246,7 @@ class RequestHandler implements Runnable {
         }
     }
 
-    private void buyTicket(ObjectOutputStream toClient, BuyTicketRequestInfo buyTicketRequest) throws IOException {
+    public void buyTicket(ObjectOutputStream toClient, BuyTicketRequestInfo buyTicketRequest) throws IOException {
         log.debug("Start method \"saveTicket\"");
         Passenger passenger = PassengerDAO.loadPassenger(buyTicketRequest.getFirstname(),
                 buyTicketRequest.getLastname(), new Timestamp(buyTicketRequest.getBirthday().getTime()));
@@ -339,7 +339,7 @@ class RequestHandler implements Runnable {
         }
     }
 
-    private boolean stationFromBeforeStationToInList(Station stationFrom, Station stationTo, List<Object[]> allStationsByTrain) {
+    public boolean stationFromBeforeStationToInList(Station stationFrom, Station stationTo, List<Object[]> allStationsByTrain) {
         log.debug("Start method \"stationFromBeforeStationToInList\"");
         boolean firstFound = false;
         for (Object[] obj : allStationsByTrain) {
@@ -354,7 +354,7 @@ class RequestHandler implements Runnable {
         return false;
     }
 
-    private boolean stationInList(Station station, List<Object[]> allStationsByTrain) {
+    public boolean stationInList(Station station, List<Object[]> allStationsByTrain) {
         log.debug("Start method \"stationInList\"");
         for (Object[] obj : allStationsByTrain) {
             String stationName = (String) obj[1];
@@ -365,7 +365,7 @@ class RequestHandler implements Runnable {
         return false;
     }
 
-    private int calcFreeSeats(HashMap<Integer, Integer[]> passengerByStation, List<Object[]> allStationsByTrain, Station stationFrom, Station stationTo, Train train) {
+    public int calcFreeSeats(HashMap<Integer, Integer[]> passengerByStation, List<Object[]> allStationsByTrain, Station stationFrom, Station stationTo, Train train) {
         log.debug("Start method \"calcFreeSeats\"");
         int occupiedSeats = 0;
         int maxOccupied = -1;
@@ -390,7 +390,7 @@ class RequestHandler implements Runnable {
         return train.getTotalSeats() - maxOccupied;
     }
 
-    private void scheduleByStation(ObjectOutputStream toClient, ScheduleRequestInfo scheduleRequest) throws IOException {
+    public void scheduleByStation(ObjectOutputStream toClient, ScheduleRequestInfo scheduleRequest) throws IOException {
         log.debug("Start method \"scheduleByStation\"");
         List<Object[]> trains = TrainDAO.findTrainByStation(scheduleRequest.getStation());
 
@@ -400,7 +400,7 @@ class RequestHandler implements Runnable {
 
     }
 
-    private void findTrain(ObjectOutputStream toClient, FindTrainRequestInfo findRequest) throws IOException {
+    public void findTrain(ObjectOutputStream toClient, FindTrainRequestInfo findRequest) throws IOException {
         log.debug("Start method \"findTrain\"");
         List<Object[]> trains = TrainDAO.findTrain(findRequest.getStationFrom(),
                 findRequest.getStationTo(), findRequest.getDateFrom(), findRequest.getDateTo());
@@ -411,7 +411,7 @@ class RequestHandler implements Runnable {
 
     }
 
-    private void getAllStation(ObjectOutputStream toClient) throws IOException {
+    public void getAllStation(ObjectOutputStream toClient) throws IOException {
         log.debug("Start method \"getAllStation\"");
         List<Station> allStationList = StationDAO.getAllStation();
         List<String> allStation = new ArrayList<String>();
@@ -423,7 +423,7 @@ class RequestHandler implements Runnable {
         toClient.writeObject(respond);
     }
 
-    private void getAllRoutes(ObjectOutputStream toClient) throws IOException {
+    public void getAllRoutes(ObjectOutputStream toClient) throws IOException {
         log.debug("Start method \"getAllRoutes\"");
         List<Route> allRoutesList = RouteDAO.getAllRoutes();
         List<String> allRoutes = new ArrayList<String>();
