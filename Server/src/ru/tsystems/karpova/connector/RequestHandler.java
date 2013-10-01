@@ -253,12 +253,14 @@ class RequestHandler implements Runnable {
         if (passenger == null) {
             passenger = new Passenger(buyTicketRequest.getFirstname(),
                     buyTicketRequest.getLastname(), new Timestamp(buyTicketRequest.getBirthday().getTime()));
-            if (!PassengerDAO.saveNewPassenger(passenger)) {
+            if (!PassengerDAO.savePassenger(passenger)) {
                 BuyTicketRespondInfo respond = new BuyTicketRespondInfo(BuyTicketRespondInfo.SERVER_ERROR_STATUS);
                 log.debug("Send BuyTicketRespondInfo to client with SERVER_ERROR_STATUS");
                 toClient.writeObject(respond);
                 return;
             }
+            passenger = PassengerDAO.loadPassenger(buyTicketRequest.getFirstname(),
+                    buyTicketRequest.getLastname(), new Timestamp(buyTicketRequest.getBirthday().getTime()));
         }
         Train train = TrainDAO.loadTrain(buyTicketRequest.getTrain());
         if (train == null) {
@@ -365,24 +367,24 @@ class RequestHandler implements Runnable {
 
     private int calcFreeSeats(HashMap<Integer, Integer[]> passengerByStation, List<Object[]> allStationsByTrain, Station stationFrom, Station stationTo, Train train) {
         log.debug("Start method \"calcFreeSeats\"");
-        int initialSeats = 0;
+        int occupiedSeats = 0;
         int maxOccupied = -1;
         boolean calcMax = false;
         for (Object[] obj : allStationsByTrain) {
             Integer stationId = (Integer) obj[0];
             String stationName = (String) obj[1];
+            if (stationTo.getName().equals(stationName)) {
+                break;
+            }
             if (passengerByStation.containsKey(stationId)) {
                 Integer[] change = passengerByStation.get(stationId);
-                initialSeats += change[0] - change[1];
+                occupiedSeats += change[0] - change[1];
             }
             if (stationFrom.getName().equals(stationName)) {
                 calcMax = true;
             }
-            if (calcMax) {
-                maxOccupied = initialSeats;
-            }
-            if (stationTo.getName().equals(stationName)) {
-                break;
+            if (calcMax && maxOccupied < occupiedSeats) {
+                maxOccupied = occupiedSeats;
             }
         }
         return train.getTotalSeats() - maxOccupied;

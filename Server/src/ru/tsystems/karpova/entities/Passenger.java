@@ -20,8 +20,8 @@ public class Passenger {
     }
 
     public Passenger(String firstname, String lastname, Timestamp birthday) {
-        this.firstname = firstname;
-        this.lastname = lastname;
+        this.firstname = firstname.toLowerCase();
+        this.lastname = lastname.toLowerCase();
         this.birthday = birthday;
     }
 
@@ -42,7 +42,7 @@ public class Passenger {
     }
 
     public void setFirstname(String firstname) {
-        this.firstname = firstname;
+        this.firstname = firstname.toLowerCase();
     }
 
     @Column(name = "lastname")
@@ -52,7 +52,7 @@ public class Passenger {
     }
 
     public void setLastname(String lastname) {
-        this.lastname = lastname;
+        this.lastname = lastname.toLowerCase();
     }
 
     @Column(name = "birthday")

@@ -9,7 +9,7 @@ public class Train {
     private int id;
 
     public Train(String name, int totalSeats, Timestamp departure, Route routeByIdRoute) {
-        this.name = name;
+        this.name = name.toLowerCase();
         this.totalSeats = totalSeats;
         this.departure = departure;
         this.routeByIdRoute = routeByIdRoute;
@@ -33,7 +33,7 @@ public class Train {
     @Column(name = "name")
     @Basic
     public String getName() {
-        return name;
+        return name.toLowerCase();
     }
 
     public void setName(String name) {

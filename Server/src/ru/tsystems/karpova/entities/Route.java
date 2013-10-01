@@ -8,7 +8,7 @@ import java.util.Collection;
 public class Route {
     private int id;
 
-    @javax.persistence.Column(name = "id")
+    @Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -20,10 +20,10 @@ public class Route {
 
     private String name;
 
-    @javax.persistence.Column(name = "name")
+    @Column(name = "name")
     @Basic
     public String getName() {
-        return name;
+        return name.toLowerCase();
     }
 
     public void setName(String name) {
@@ -32,7 +32,7 @@ public class Route {
 
     private double coeffDate;
 
-    @javax.persistence.Column(name = "coeff_date")
+    @Column(name = "coeff_date")
     @Basic
     public double getCoeffDate() {
         return coeffDate;
@@ -44,7 +44,7 @@ public class Route {
 
     private double coeffSeats;
 
-    @javax.persistence.Column(name = "coeff_seats")
+    @Column(name = "coeff_seats")
     @Basic
     public double getCoeffSeats() {
         return coeffSeats;

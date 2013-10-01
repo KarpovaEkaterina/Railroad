@@ -69,28 +69,37 @@ public class Client {
     private static boolean start(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start method \"start\"");
         System.out.println("1 - registration, 2 - login, 0 - exit");
-        String scan = scanner.next();
+        String scan = scanner.next().toLowerCase();
         while (!"1".equals(scan) && !"2".equals(scan) && !"0".equals(scan)) {
             System.out.println("Input 0, 1 or 2");
-            scan = scanner.next();
+            scan = scanner.next().toLowerCase();
         }
 
         if ("1".equals(scan)) {
-            boolean registration = ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_PASSENGER);
+            int registration = ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_PASSENGER);
             log.debug("Method \"registration\" returned " + registration);
-            if (registration) {
+            if (registration > 0) {
                 log.info("Set accessLevel = ACCESS_LEVEL_PASSENGER");
                 accessLevel = ACCESS_LEVEL_PASSENGER;
             }
-            return registration;
-        } else if ("2".equals(scan)) {
+            return registration > 0;
+        } else if ("2".
+
+                equals(scan)
+
+                )
+
+        {
             int accessLevel = ClientLoginHelper.login(scanner, toServer, fromServer);
             log.debug("Method \"login\" returned " + accessLevel);
             Client.accessLevel = accessLevel;
             return accessLevel != -1;
-        } else {
+        } else
+
+        {
             return true;
         }
+
     }
 
     private static boolean homePage(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException, ParseException {
@@ -112,10 +121,10 @@ public class Client {
     private static boolean homePageForAdmin(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         System.out.println("1 - add user, 0 - exit");
         log.debug("Start method \"homePageForAdmin\"");
-        String scan = scanner.next();
+        String scan = scanner.next().toLowerCase();
         while (!"1".equals(scan) && !"0".equals(scan)) {
             System.out.println("Input 1 or 0");
-            scan = scanner.next();
+            scan = scanner.next().toLowerCase();
         }
         if ("1".equals(scan)) {
             ClientLoginHelper.registration(scanner, toServer, fromServer, ACCESS_LEVEL_MANAGER);
@@ -128,11 +137,11 @@ public class Client {
     private static boolean homePageForManager(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start method \"homePageForManager\"");
         System.out.println("1 - add train, 2 - add station, 3 - add route, 4 - registered passengers, 5 - all trains, 6 - sell ticket, 0 - exit");
-        String scan = scanner.next();
+        String scan = scanner.next().toLowerCase();
         while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) &&
                 !"4".equals(scan) && !"5".equals(scan) && !"6".equals(scan) && !"0".equals(scan)) {
             System.out.println("Input 0, 1, 2, 3, 4, 5 or 6");
-            scan = scanner.next();
+            scan = scanner.next().toLowerCase();
         }
         switch (scan.charAt(0)) {
             case '1': {
@@ -164,10 +173,10 @@ public class Client {
     private static boolean homePageForPassenger(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws ParseException, IOException, ClassNotFoundException {
         log.debug("Start method \"homePageForPassenger\"");
         System.out.println("1 - find train, 2 - timetable by station, 3 - buy ticket, 0 - exit");
-        String scan = scanner.next();
+        String scan = scanner.next().toLowerCase();
         while (!"1".equals(scan) && !"2".equals(scan) && !"3".equals(scan) && !"0".equals(scan)) {
             System.out.println("Input 0, 1, 2 or 3");
-            scan = scanner.next();
+            scan = scanner.next().toLowerCase();
         }
         switch (scan.charAt(0)) {
             case '1': {

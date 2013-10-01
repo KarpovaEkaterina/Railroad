@@ -24,22 +24,22 @@ public class PassengerHomePageHelper {
     static boolean buyTicket(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start \"saveTicket\" method");
         System.out.println("Input train name:");
-        String train = scanner.next();
+        String train = scanner.next().toLowerCase();
         System.out.println("Input departure station:");
-        String stationFrom = scanner.next();
+        String stationFrom = scanner.next().toLowerCase();
         System.out.println("Input arrival station:");
-        String stationTo = scanner.next();
+        String stationTo = scanner.next().toLowerCase();
         System.out.println("Input firstname:");
-        String firstname = scanner.next();
+        String firstname = scanner.next().toLowerCase();
         System.out.println("Input lastname:");
-        String lastname = scanner.next();
+        String lastname = scanner.next().toLowerCase();
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         boolean flag;
         Date birthday = null;
         do {
             try {
                 System.out.println("Input birthday (use format \"dd.MM.yyyy\")");
-                birthday = dateFormat.parse(scanner.next());
+                birthday = dateFormat.parse(scanner.next().toLowerCase());
                 flag = true;
             } catch (ParseException e) {
                 log.error("Incorrect date");
@@ -115,7 +115,7 @@ public class PassengerHomePageHelper {
         String station;
         do {
             System.out.println("Departure station:");
-            station = scanner.next();
+            station = scanner.next().toLowerCase();
         }
         while (!listAllStation.contains(station));
 
@@ -137,6 +137,7 @@ public class PassengerHomePageHelper {
                 for (ScheduleRespondInfo.TrainInfo info : respond.getTrains()) {
                     System.out.println(info.getTrainName() + " --- " + dateFormat.format(info.getDeparture()));
                 }
+                return true;
             }
         }
         log.error("Unknown object type");
@@ -155,19 +156,19 @@ public class PassengerHomePageHelper {
         Date dateTo = null;
         do {
             System.out.println("Departure station:");
-            stationFrom = scanner.next();
+            stationFrom = scanner.next().toLowerCase();
         }
         while (!listAllStation.contains(stationFrom));
         do {
             System.out.println("Arrival station:");
-            stationTo = scanner.next();
+            stationTo = scanner.next().toLowerCase();
         } while (!listAllStation.contains(stationTo));
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
         boolean flag;
         do {
             try {
                 System.out.println("Input departure time (use format \"dd.MM.yyyy hh:mm\")");
-                dateFrom = dateFormat.parse(scanner.next() + " " + scanner.next());
+                dateFrom = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 flag = true;
             } catch (ParseException e) {
                 System.out.println("Incorrect date");
@@ -178,7 +179,7 @@ public class PassengerHomePageHelper {
         do {
             try {
                 System.out.println("Input arrival time (use format \"dd.MM.yyyy hh:mm\")");
-                dateTo = dateFormat.parse(scanner.next() + " " + scanner.next());
+                dateTo = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 flag = true;
             } catch (ParseException e) {
                 System.out.println("Incorrect date");

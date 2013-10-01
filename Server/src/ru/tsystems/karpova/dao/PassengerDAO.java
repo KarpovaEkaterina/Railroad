@@ -31,9 +31,9 @@ public class PassengerDAO {
         return (Long) results.get(0) != 0;
     }
 
-    public static boolean saveNewPassenger(Passenger passenger) {
+    public static boolean savePassenger(Passenger passenger) {
         EntityManager em = emf.createEntityManager();
-        log.debug("Start saveNewPassenger");
+        log.debug("Start savePassenger");
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

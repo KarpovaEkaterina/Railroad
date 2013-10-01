@@ -12,8 +12,7 @@ public class Station {
     private int id;
 
     public Station(String stationName) {
-        this.name = stationName;
-
+        this.name = stationName.toLowerCase();
     }
 
     public Station() {
@@ -34,7 +33,7 @@ public class Station {
     @Column(name = "name")
     @Basic
     public String getName() {
-        return name;
+        return name.toLowerCase();
     }
 
     public void setName(String name) {

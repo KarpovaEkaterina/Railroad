@@ -30,7 +30,7 @@ public class User {
     @javax.persistence.Column(name = "login")
     @Basic
     public String getLogin() {
-        return login;
+        return login.toLowerCase();
     }
 
     public void setLogin(String login) {

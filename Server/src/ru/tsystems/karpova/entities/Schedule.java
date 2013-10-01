@@ -2,18 +2,11 @@ package ru.tsystems.karpova.entities;
 
 import javax.persistence.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ekaterina
- * Date: 29.09.13
- * Time: 17:31
- * To change this template use File | Settings | File Templates.
- */
 @Entity
 public class Schedule {
     private int id;
 
-    @javax.persistence.Column(name = "id")
+    @Column(name = "id")
     @Id
     public int getId() {
         return id;
@@ -25,7 +18,7 @@ public class Schedule {
 
     private int seqNumber;
 
-    @javax.persistence.Column(name = "seq_number")
+    @Column(name = "seq_number")
     @Basic
     public int getSeqNumber() {
         return seqNumber;

@@ -43,11 +43,6 @@
             <version>4.2.5.Final</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
-
-    <build>
-        <finalName>railroad</finalName>
-    </build>
-
-
 </project>

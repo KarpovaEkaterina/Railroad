@@ -18,10 +18,10 @@ public class ClientLoginHelper {
     public static final int LOGIN_FAILED_RETURN_CODE = -1;
     private static Logger log = Logger.getLogger(ClientLoginHelper.class);
 
-    static boolean registration(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer, int accessLevel) throws IOException, ClassNotFoundException {
+    static int registration(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer, int accessLevel) throws IOException, ClassNotFoundException {
         log.debug("Start \"registration\" method");
         System.out.println("Input login:");
-        String login = scanner.next();
+        String login = scanner.next().toLowerCase();
         System.out.println("Input password:");
         String password = scanner.next();
         RegistrationRequestInfo reg = new RegistrationRequestInfo(login, password, accessLevel);
@@ -34,7 +34,7 @@ public class ClientLoginHelper {
             if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");
-                return false;
+                return -2;
             } else if (o instanceof RegistrationRespondInfo) {
                 RegistrationRespondInfo respond = (RegistrationRespondInfo) o;
                 log.debug("Received RegistrationRespondInfo from server");
@@ -43,27 +43,27 @@ public class ClientLoginHelper {
                     case RegistrationRespondInfo.OK_STATUS: {
                         System.out.println("Registration successful");
                         log.debug("Registration successful");
-                        return true;
+                        return respond.getRights();
                     }
                     case RegistrationRespondInfo.DUPLICATED_LOGIN_STATUS: {
                         System.out.println("User with that login already exists");
                         log.debug("Duplicated login");
-                        return true;
+                        return respond.getRights();
                     }
                     default:
-                        return false;
+                        return -3;
                 }
             }
         }
         log.error("Unknown object type");
-        return false;
+        return -4;
     }
 
     static int login(Scanner scanner, ObjectOutputStream toServer, ObjectInputStream fromServer) throws
             IOException, ClassNotFoundException {
         log.debug("Start \"login\" method");
         System.out.println("Input login:");
-        String login = scanner.next();
+        String login = scanner.next().toLowerCase();
         System.out.println("Input password:");
         String password = scanner.next();
         AuthorizationRequestInfo auth = new AuthorizationRequestInfo(login, password);

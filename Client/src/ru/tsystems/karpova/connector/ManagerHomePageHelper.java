@@ -21,11 +21,11 @@ public class ManagerHomePageHelper {
         log.debug("Start \"addTrain\" method");
         List<String> listAllRoute = listRoute(toServer, fromServer);
         System.out.println("Input train name:");
-        String trainName = scanner.next();
+        String trainName = scanner.next().toLowerCase();
         String route;
         do {
             System.out.println("Input route:");
-            route = scanner.next();
+            route = scanner.next().toLowerCase();
         }
         while (!listAllRoute.contains(route));
         System.out.println("Input total seats number:");
@@ -36,7 +36,7 @@ public class ManagerHomePageHelper {
         do {
             try {
                 System.out.println("Input departure time (use format \"dd.MM.yyyy hh:mm\")");
-                departureTime = dateFormat.parse(scanner.next() + " " + scanner.next());
+                departureTime = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 Date currentTime = new Date();
                 if (currentTime.before(departureTime)) {
                     flag = true;
@@ -119,7 +119,7 @@ public class ManagerHomePageHelper {
         do {
             System.out.println("Station name must be unique!");
             System.out.println("Input station name:");
-            stationName = scanner.next();
+            stationName = scanner.next().toLowerCase();
         } while (listAllStation.contains(stationName));
 
         AddStationRequestInfo req = new AddStationRequestInfo(stationName);
@@ -159,7 +159,7 @@ public class ManagerHomePageHelper {
         do {
             System.out.println("Route name must be unique!");
             System.out.println("Input route name:");
-            routeName = scanner.next();
+            routeName = scanner.next().toLowerCase();
         } while (listAllRoute.contains(routeName));
         List<String> listAllStation = PassengerHomePageHelper.listStations(toServer, fromServer);
         List<String> stationsForNewRoute = new ArrayList<String>();
@@ -167,13 +167,13 @@ public class ManagerHomePageHelper {
         String station;
         do {
             System.out.println("Input first station");
-            station = scanner.next();
+            station = scanner.next().toLowerCase();
         } while (!listAllStation.contains(station));
         stationsForNewRoute.add(station);
         do {
             do {
                 System.out.println("Input next station or \"end\" to stop");
-                station = scanner.next();
+                station = scanner.next().toLowerCase();
             } while (!listAllStation.contains(station) && !station.equals("end"));
             if (station.equals("end")) {
                 if (stationsForNewRoute.size() < 2) {
@@ -204,7 +204,7 @@ public class ManagerHomePageHelper {
                     try {
                         System.out.println("Input time \"hh:mm\"");
                         DateFormat dateFormat = new SimpleDateFormat("hh:mm");
-                        time = new Timestamp(dateFormat.parse(scanner.next()).getTime());
+                        time = new Timestamp(dateFormat.parse(scanner.next().toLowerCase()).getTime());
                         flag = true;
                     } catch (ParseException e) {
                         log.error("Incorrect time");
@@ -270,7 +270,7 @@ public class ManagerHomePageHelper {
     public static boolean viewPassengerByTrain(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start \"viewPassengerByTrain\" method");
         System.out.println("Input train name");
-        String trainName = scanner.next();
+        String trainName = scanner.next().toLowerCase();
         ViewPassengerByTrainRequestInfo request = new ViewPassengerByTrainRequestInfo(trainName);
         log.debug("Send ViewPassengerByTrainRequestInfo to server");
         toServer.writeObject(request);
