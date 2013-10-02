@@ -157,7 +157,7 @@ public class Client {
                 return ManagerHomePageHelper.viewPassengerByTrain(toServer, fromServer, scanner);
             }
             case '5': {
-                return ManagerHomePageHelper.veiwAllTrains(toServer, fromServer, scanner);
+                return ManagerHomePageHelper.veiwAllTrains(toServer, fromServer);
             }
             case '6': {
                 return PassengerHomePageHelper.buyTicket(toServer, fromServer, scanner);

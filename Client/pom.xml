@@ -17,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>Railroad</groupId>
-            <artifactId>Server</artifactId>
+            <artifactId>Common</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

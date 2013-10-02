@@ -1,11 +1,11 @@
 package ru.tsystems.karpova.connector;
 
 import org.apache.log4j.Logger;
-import ru.tsystems.karpova.connector.requests.AuthorizationRequestInfo;
-import ru.tsystems.karpova.connector.requests.RegistrationRequestInfo;
-import ru.tsystems.karpova.connector.respond.AuthorizationRespondInfo;
-import ru.tsystems.karpova.connector.respond.RegistrationRespondInfo;
-import ru.tsystems.karpova.connector.respond.RespondInfo;
+import ru.tsystems.karpova.requests.AuthorizationRequestInfo;
+import ru.tsystems.karpova.requests.RegistrationRequestInfo;
+import ru.tsystems.karpova.respond.AuthorizationRespondInfo;
+import ru.tsystems.karpova.respond.RegistrationRespondInfo;
+import ru.tsystems.karpova.respond.RespondInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

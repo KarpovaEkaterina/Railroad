@@ -1,11 +1,11 @@
 package ru.tsystems.karpova.connector;
 
 import org.apache.log4j.Logger;
-import ru.tsystems.karpova.connector.requests.BuyTicketRequestInfo;
-import ru.tsystems.karpova.connector.requests.FindTrainRequestInfo;
-import ru.tsystems.karpova.connector.requests.GetAllStationsRequestInfo;
-import ru.tsystems.karpova.connector.requests.ScheduleRequestInfo;
-import ru.tsystems.karpova.connector.respond.*;
+import ru.tsystems.karpova.requests.BuyTicketRequestInfo;
+import ru.tsystems.karpova.requests.FindTrainRequestInfo;
+import ru.tsystems.karpova.requests.GetAllStationsRequestInfo;
+import ru.tsystems.karpova.requests.ScheduleRequestInfo;
+import ru.tsystems.karpova.respond.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -108,7 +108,7 @@ public class PassengerHomePageHelper {
     static boolean timetableByStation(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start \"timetableByStation\" method");
         List<String> listAllStation = listStations(toServer, fromServer);
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         if (listAllStation == null) {
             return false;
         }
@@ -163,11 +163,11 @@ public class PassengerHomePageHelper {
             System.out.println("Arrival station:");
             stationTo = scanner.next().toLowerCase();
         } while (!listAllStation.contains(stationTo));
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         boolean flag;
         do {
             try {
-                System.out.println("Input departure time (use format \"dd.MM.yyyy hh:mm\")");
+                System.out.println("Input departure time (use format \"dd.MM.yyyy HH:mm\")");
                 dateFrom = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 flag = true;
             } catch (ParseException e) {
@@ -178,7 +178,7 @@ public class PassengerHomePageHelper {
         } while (!flag);
         do {
             try {
-                System.out.println("Input arrival time (use format \"dd.MM.yyyy hh:mm\")");
+                System.out.println("Input arrival time (use format \"dd.MM.yyyy HH:mm\")");
                 dateTo = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 flag = true;
             } catch (ParseException e) {

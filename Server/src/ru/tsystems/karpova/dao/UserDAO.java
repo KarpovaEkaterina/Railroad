@@ -3,19 +3,18 @@ package ru.tsystems.karpova.dao;
 import org.apache.log4j.Logger;
 import ru.tsystems.karpova.entities.User;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import java.util.List;
 
-public class UserDAO {
+public class UserDAO extends BasicDAO{
 
     private static Logger log = Logger.getLogger(UserDAO.class);
 
-    private static EntityManagerFactory emf = Persistence
-            .createEntityManagerFactory("myapp");
-
-    public static boolean saveUser(User user) {
-        EntityManager em = emf.createEntityManager();
+    public boolean saveUser(User user) {
         log.debug("Start saveUser");
+        EntityManager em = emf.createEntityManager();
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
@@ -32,8 +31,7 @@ public class UserDAO {
         }
     }
 
-    public static User loadUserByLogin(String login) {
-        EntityManager em = emf.createEntityManager();
+    public User loadUserByLogin(String login) {
         log.debug("Start loadUserByLogin select");
         List results = em.createQuery("from User where login=?").setParameter(1, login).getResultList();
         return results == null || results.isEmpty() ? null : (User) results.get(0);

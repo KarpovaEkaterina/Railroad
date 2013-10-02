@@ -1,8 +1,8 @@
 package ru.tsystems.karpova.connector;
 
 import org.apache.log4j.Logger;
-import ru.tsystems.karpova.connector.requests.*;
-import ru.tsystems.karpova.connector.respond.*;
+import ru.tsystems.karpova.requests.*;
+import ru.tsystems.karpova.respond.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,22 +20,28 @@ public class ManagerHomePageHelper {
     public static boolean addTrain(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
         log.debug("Start \"addTrain\" method");
         List<String> listAllRoute = listRoute(toServer, fromServer);
-        System.out.println("Input train name:");
-        String trainName = scanner.next().toLowerCase();
+        List<String> listTrainsName = listTrains(toServer, fromServer);
+        String trainName;
+        do {
+            System.out.println("Train name must be unique!");
+            System.out.println("Input train name:");
+            trainName = scanner.next().toLowerCase();
+        }
+        while (listTrainsName.contains(trainName));
         String route;
         do {
-            System.out.println("Input route:");
+            System.out.println("Input route from list:");
             route = scanner.next().toLowerCase();
         }
         while (!listAllRoute.contains(route));
         System.out.println("Input total seats number:");
         int totalSeats = scanner.nextInt();
         Date departureTime = null;
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         boolean flag = false;
         do {
             try {
-                System.out.println("Input departure time (use format \"dd.MM.yyyy hh:mm\")");
+                System.out.println("Input departure time (use format \"dd.MM.yyyy HH:mm\")");
                 departureTime = dateFormat.parse(scanner.next().toLowerCase() + " " + scanner.next().toLowerCase());
                 Date currentTime = new Date();
                 if (currentTime.before(departureTime)) {
@@ -202,8 +208,8 @@ public class ManagerHomePageHelper {
                 Timestamp time = null;
                 do {
                     try {
-                        System.out.println("Input time \"hh:mm\"");
-                        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
+                        System.out.println("Input time \"HH:mm\"");
+                        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
                         time = new Timestamp(dateFormat.parse(scanner.next().toLowerCase()).getTime());
                         flag = true;
                     } catch (ParseException e) {
@@ -307,8 +313,8 @@ public class ManagerHomePageHelper {
         return false;
     }
 
-    public static boolean veiwAllTrains(ObjectOutputStream toServer, ObjectInputStream fromServer, Scanner scanner) throws IOException, ClassNotFoundException {
-        log.debug("Start \"veiwAllTrains\" method");
+    private static List<Object[]> getAllTrains(ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
+        log.debug("Start \"getAllTrains\" method");
         GetAllTrainsRequestInfo req = new GetAllTrainsRequestInfo();
         log.debug("Send GetAllTrainsRequestInfo to server");
         toServer.writeObject(req);
@@ -318,25 +324,46 @@ public class ManagerHomePageHelper {
             if (((RespondInfo) o).getStatus() == RespondInfo.SERVER_ERROR_STATUS) {
                 System.out.println("Server error");
                 log.debug("Server error");
-                return false;
+                return null;
             } else if (o instanceof GetAllTrainsRespondInfo) {
                 GetAllTrainsRespondInfo respond = (GetAllTrainsRespondInfo) o;
                 log.debug("Received GetAllTrainsRespondInfo from server");
 
                 List<Object[]> allTrains = respond.getListAllTrains();
-                System.out.println("Trains:");
-                System.out.println("Trains name --- Total seats --- Departure time --- Route");
-                for (Object[] trains : allTrains) {
-                    System.out.print(trains[0] + "  ");
-                    System.out.print(trains[1] + "  ");
-                    System.out.print(trains[2] + "  ");
-                    System.out.println(trains[3]);
-                }
-                log.debug("Get all trains");
-                return true;
+                return allTrains;
             }
         }
         log.error("Unknown object type");
-        return false;
+        return null;
     }
+
+    public static List<String> listTrains(ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
+        log.debug("Start \"listTrains\" method");
+        List<Object[]> allTrains = getAllTrains(toServer, fromServer);
+        List<String> allNameTrains = new ArrayList<String>();
+        for (Object[] trains : allTrains) {
+            allNameTrains.add((String) trains[0]);
+        }
+        log.debug("Get all trains");
+        return allNameTrains;
+    }
+
+    public static boolean veiwAllTrains(ObjectOutputStream toServer, ObjectInputStream fromServer) throws IOException, ClassNotFoundException {
+        log.debug("Start \"veiwAllTrains\" method");
+        List<Object[]> allTrains = getAllTrains(toServer, fromServer);
+        if(allTrains == null){
+            return false;
+        }
+        System.out.println("Trains:");
+        System.out.println("Trains name --- Total seats --- Departure time --- Route");
+        for (Object[] trains : allTrains) {
+            System.out.print(trains[0] + "  ");
+            System.out.print(trains[1] + "  ");
+            System.out.print(trains[2] + "  ");
+            System.out.println(trains[3]);
+        }
+        log.debug("Get all trains");
+        return true;
+    }
+
 }

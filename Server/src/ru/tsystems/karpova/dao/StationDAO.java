@@ -3,31 +3,29 @@ package ru.tsystems.karpova.dao;
 import org.apache.log4j.Logger;
 import ru.tsystems.karpova.entities.Station;
 
-import javax.persistence.*;
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import java.util.List;
 
-public class StationDAO {
+public class StationDAO extends BasicDAO{
 
     private static Logger log = Logger.getLogger(StationDAO.class);
 
-    private static EntityManagerFactory emf = Persistence
-            .createEntityManagerFactory("myapp");
-
-    public static List<Station> getAllStation() {
-        EntityManager em = emf.createEntityManager();
+    public List<Station> getAllStation() {
         log.debug("Start getAllStation select");
         List<Station> results = em.createQuery("from Station").getResultList();
         return results;
     }
 
-    public static Station loadStationByName(String name) {
-        EntityManager em = emf.createEntityManager();
+    public Station loadStationByName(String name) {
         log.debug("Start loadStationByName select");
         List results = em.createQuery("from Station where name=?").setParameter(1, name).getResultList();
         return results == null || results.isEmpty() ? null : (Station) results.get(0);
     }
 
-    public static boolean saveStation(Station station) {
+    public boolean saveStation(Station station) {
         EntityManager em = emf.createEntityManager();
         log.debug("Start saveStation");
         EntityTransaction trx = em.getTransaction();

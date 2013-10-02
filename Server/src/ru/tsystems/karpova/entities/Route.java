@@ -1,7 +1,6 @@
 package ru.tsystems.karpova.entities;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity

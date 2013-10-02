@@ -3,25 +3,22 @@ package ru.tsystems.karpova.dao;
 import org.apache.log4j.Logger;
 import ru.tsystems.karpova.entities.Route;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import java.util.List;
 
-public class RouteDAO {
+public class RouteDAO extends BasicDAO{
 
     private static Logger log = Logger.getLogger(RouteDAO.class);
 
-    private static EntityManagerFactory emf = Persistence
-            .createEntityManagerFactory("myapp");
-
-    public static List<Route> getAllRoutes() {
-        EntityManager em = emf.createEntityManager();
+    public List<Route> getAllRoutes() {
         log.debug("Start getAllRoutes select");
         List<Route> results = em.createQuery("from Route").getResultList();
         return results;
     }
 
-    public static Route loadRoute(String route) {
-        EntityManager em = emf.createEntityManager();
+    public Route loadRoute(String route) {
         log.debug("Start loadRoute select");
         List results = em.createQuery("from Route where name = ?")
                 .setParameter(1, route)
@@ -29,9 +26,9 @@ public class RouteDAO {
         return results == null || results.isEmpty() ? null : (Route) results.get(0);
     }
 
-    public static boolean saveRoute(Route route) {
-        EntityManager em = emf.createEntityManager();
+    public boolean saveRoute(Route route) {
         log.debug("Start saveRoute");
+        EntityManager em = emf.createEntityManager();
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();

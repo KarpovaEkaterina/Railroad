@@ -5,28 +5,25 @@ import ru.tsystems.karpova.entities.Passenger;
 import ru.tsystems.karpova.entities.Station;
 import ru.tsystems.karpova.entities.Train;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
-public class TrainDAO {
+public class TrainDAO extends BasicDAO {
+
     private static Logger log = Logger.getLogger(TrainDAO.class);
 
-    private static EntityManagerFactory emf = Persistence
-            .createEntityManagerFactory("myapp");
-
-    public static Train loadTrain(String trainName) {
-        EntityManager em = emf.createEntityManager();
+    public Train loadTrain(String trainName) {
         log.debug("Start loadTrain select");
         List results = em.createQuery("from Train where name=?").setParameter(1, trainName).getResultList();
         return results == null || results.isEmpty() ? null : (Train) results.get(0);
     }
 
-    public static List findTrain(String stationFrom, String stationTo, Date dateFrom, Date dateTo) {
-        EntityManager em = emf.createEntityManager();
+    public List findTrain(String stationFrom, String stationTo, Date dateFrom, Date dateTo) {
         log.debug("Start findTrain select");
         List results = em.createNativeQuery("select train.name,\n" +
                 "FROM_UNIXTIME(\n" +
@@ -50,7 +47,7 @@ public class TrainDAO {
                 "inner join way as wayTime on scheduleTime.id_way = wayTime.id\n" +
                 "where stationA.name = ?\n" +
                 "and stationB.name = ?\n" +
-                "and scheduleA.seq_number < scheduleB.seq_number\n" +
+                "and scheduleA.seq_number <= scheduleB.seq_number\n" +
                 "and scheduleTime.seq_number <= scheduleA.seq_number\n" +
                 "group by\n" +
                 "train.name\n" +
@@ -65,11 +62,10 @@ public class TrainDAO {
 
     }
 
-    public static List<Object[]> findTrainByStation(String station) {
-        EntityManager em = emf.createEntityManager();
+    public List<Object[]> findTrainByStation(String station) {
         log.debug("Start findTrainByStation select");
         List results = em.createQuery("select t.name,\n" +
-                "(t.departure + SUM(case when wayTime.id = wayA.id then 0 else wayTime.time end)) as startTime\n" +
+                "FROM_UNIXTIME(UNIX_TIMESTAMP(t.departure) + SUM(case when wayTime.id = wayA.id then 0 else UNIX_TIMESTAMP(wayTime.time) end)) as startTime\n" +
                 "from Train t \n" +
                 "join t.routeByIdRoute r\n" +
                 "join r.schedulesById scheduleA\n" +
@@ -85,11 +81,10 @@ public class TrainDAO {
         return results;
     }
 
-    public static boolean checkDepartureTime(Train train, Station stationFrom) {
-        EntityManager em = emf.createEntityManager();
+    public boolean checkDepartureTime(Train train, Station stationFrom) {
         log.debug("Start checkDepartureTime select");
         List results = em.createQuery("select current_timestamp, \n" +
-                "(t.departure + SUM(case when wayTime.id = wayA.id then 0 else wayTime.time end)) as departureTime \n" +
+                "FROM_UNIXTIME(UNIX_TIMESTAMP(t.departure) + SUM(case when wayTime.id = wayA.id then 0 else UNIX_TIMESTAMP(wayTime.time) end)) as departureTime \n" +
                 "from Train t \n" +
                 "join t.routeByIdRoute r\n" +
                 "join r.schedulesById scheduleA\n" +
@@ -98,20 +93,26 @@ public class TrainDAO {
                 "join r.schedulesById scheduleTime\n" +
                 "join scheduleTime.wayByIdWay wayTime\n" +
                 "where stationA.name = ?\n" +
-                " and t.name = ?\n" +
+                "and t.name = ?\n" +
                 "and scheduleTime.seqNumber <= scheduleA.seqNumber\n" +
                 "group by t.name\n")
                 .setParameter(1, stationFrom.getName())
                 .setParameter(2, train.getName())
                 .getResultList();
-        Timestamp current = (Timestamp) ((Object[]) results.get(0))[0];
-        current.setTime(current.getTime() + 10 * 60 * 1000);
-        Timestamp departure = (Timestamp) ((Object[]) results.get(0))[1];
-        return results.size() == 0 ? false : current.before(departure);
+        if (results.size() <= 0) {
+            log.debug("Query in checkDepartureTime returned no rows.");
+            return false;
+        } else {
+            log.debug("Query in checkDepartureTime returned current time: " + ((Object[]) results.get(0))[0]
+                    + "and departure time: " + ((Object[]) results.get(0))[1]);
+            Timestamp current = (Timestamp) ((Object[]) results.get(0))[0];
+            current.setTime(current.getTime() + 10 * 60 * 1000);
+            Timestamp departure = (Timestamp) ((Object[]) results.get(0))[1];
+            return current.before(departure);
+        }
     }
 
-    public static boolean isAlreadyExistPassengerOnTrain(Train train, Passenger passenger) {
-        EntityManager em = emf.createEntityManager();
+    public boolean isAlreadyExistPassengerOnTrain(Train train, Passenger passenger) {
         log.debug("Start isAlreadyExistPassengerOnTrain select");
         List results = em.createQuery("select count(*)\n" +
                 "from Train train \n" +
@@ -129,8 +130,7 @@ public class TrainDAO {
         return (Long) results.get(0) != 0;
     }
 
-    public static HashMap<Integer, Integer[]> countOfPassengerOnEveryStation(Train train) {
-        EntityManager em = emf.createEntityManager();
+    public HashMap<Integer, Integer[]> countOfPassengerOnEveryStation(Train train) {
         log.debug("Start countOfPassengerOnEveryStation select");
         List stationFrom = em.createQuery("select station.id, count(ticket.id), 0, schedule.seqNumber - 1 \n" +
                 "from Train train \n" +
@@ -182,8 +182,7 @@ public class TrainDAO {
         return result;
     }
 
-    public static List getAllStationsByTrain(Train train) {
-        EntityManager em = emf.createEntityManager();
+    public List getAllStationsByTrain(Train train) {
         log.debug("Start getAllStationsByTrain select");
         List results = em.createNativeQuery("select distinct station.id, station.name, \n" +
                 "case station.id\n" +
@@ -203,9 +202,9 @@ public class TrainDAO {
         return results;
     }
 
-    public static boolean saveTrain(Train train) {
-        EntityManager em = emf.createEntityManager();
+    public boolean saveTrain(Train train) {
         log.debug("Start saveTrain");
+        EntityManager em = emf.createEntityManager();
         EntityTransaction trx = em.getTransaction();
         try {
             trx.begin();
@@ -223,8 +222,7 @@ public class TrainDAO {
 
     }
 
-    public static List<Train> getAllTrains() {
-        EntityManager em = emf.createEntityManager();
+    public List<Train> getAllTrains() {
         log.debug("Start getAllTrains select");
         List<Train> results = em.createQuery("from Train ").getResultList();
         return results;
